@@ -1,1 +1,1 @@
-# rest-example
+# rest-example: plantilla
