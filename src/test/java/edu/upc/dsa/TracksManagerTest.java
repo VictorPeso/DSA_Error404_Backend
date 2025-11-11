@@ -1,7 +1,7 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Track;
+import edu.upc.dsa.exceptions.FailedLoginException;
+import edu.upc.dsa.models.User;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class TracksManagerTest {
     public void getTrackTest() throws Exception {
         Assert.assertEquals(3, tm.size());
 
-        Track t = this.tm.getTrack("T2");
+        User t = this.tm.getTrack("T2");
         Assert.assertEquals("Despacito", t.getTitle());
         Assert.assertEquals("Luis Fonsi", t.getSinger());
 
@@ -48,7 +48,7 @@ public class TracksManagerTest {
         Assert.assertEquals("Despacito", t.getTitle());
         Assert.assertEquals("Luis Fonsi", t.getSinger());
 
-        Assert.assertThrows(TrackNotFoundException.class, () ->
+        Assert.assertThrows(FailedLoginException.class, () ->
                 this.tm.getTrack2("XXXXXXX"));
 
     }
@@ -56,17 +56,17 @@ public class TracksManagerTest {
     @Test
     public void getTracksTest() {
         Assert.assertEquals(3, tm.size());
-        List<Track> tracks  = tm.findAll();
+        List<User> users = tm.findAll();
 
-        Track t = tracks.get(0);
+        User t = users.get(0);
         Assert.assertEquals("La Barbacoa", t.getTitle());
         Assert.assertEquals("Georgie Dann", t.getSinger());
 
-        t = tracks.get(1);
+        t = users.get(1);
         Assert.assertEquals("Despacito", t.getTitle());
         Assert.assertEquals("Luis Fonsi", t.getSinger());
 
-        t = tracks.get(2);
+        t = users.get(2);
         Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
         Assert.assertEquals("Metallica", t.getSinger());
 
@@ -77,7 +77,7 @@ public class TracksManagerTest {
     @Test
     public void updateTrackTest() {
         Assert.assertEquals(3, tm.size());
-        Track t = this.tm.getTrack("T3");
+        User t = this.tm.getTrack("T3");
         Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
         Assert.assertEquals("Metallica", t.getSinger());
 
@@ -96,7 +96,7 @@ public class TracksManagerTest {
         this.tm.deleteTrack("T3");
         Assert.assertEquals(2, tm.size());
 
-        Assert.assertThrows(TrackNotFoundException.class, () ->
+        Assert.assertThrows(FailedLoginException.class, () ->
                 this.tm.getTrack2("T3"));
 
     }
