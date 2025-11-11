@@ -43,11 +43,11 @@ public class GameService {
             @ApiResponse(code = 409, message = "Usuario ya existe")
     })
     public Response registerUser(@QueryParam("nombre") String nombre,
-                                 @QueryParam("password") String password) {
+                                 @QueryParam("password") String password) throws Exception {
 
         User u = gm.Register(nombre, password);
         GenericEntity<User> entity = new GenericEntity<User>(u) {};
-        gm.setObject();
+        gm.setObject(nombre);
         return Response.status(Response.Status.CREATED).entity(entity).build();
 
 

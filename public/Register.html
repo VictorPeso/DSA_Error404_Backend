@@ -10,11 +10,50 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
-            $("#register-btn").click(function(){
-                window.location.href = "Shop.html";
+            $("#register-btn").click(function(e){
+                e.preventDefault();
+
+                const username = $("input[name='username']").val();
+                const password = $("input[name='password']").val();
+
+                if (!username || !password) {
+                    alert("Por favor, completa todos los campos.");
+                    return;
+                }
+
+                // URL del backend Java
+                const url = "http://localhost:8080/swagger/#/game/registerUser";
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                    .then(response => {
+                        if (response.status === 201) {
+                            return response.json();
+                        } else if (response.status === 409) {
+                            throw new Error("El usuario ya existe");
+                        } else {
+                            throw new Error("Error en el registro");
+                        }
+                    })
+                    .then(data => {
+                        alert("Usuario registrado correctamente: " + data.username);
+                        window.location.href = "Shop.html";
+                    })
+                    .catch(error => {
+                        alert("Error: " + error.message);
+                    });
             });
         });
     </script>
+
 </head>
 <body>
 <div id="template-bg-1">

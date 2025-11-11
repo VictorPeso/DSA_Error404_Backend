@@ -29,17 +29,26 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public User LogIn(String username, String password) throws Exception {
+        logger.info("Iniciando sesión "+username);
         User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
+            logger.error("Usuario o contraseña incorrectas");
             throw new Exception("Usuario o contraseña incorrectas");
         }
+        logger.info("Sesión iniciada");
         return u;
     }
 
     @Override
-    public User Register(String username, String password) {
+    public User Register(String username, String password) throws Exception {
+        logger.info("registrar el usuario " + username);
+        if (registred_users.containsKey(username)) {
+            logger.error("el usuario " + username + " ya existe");
+            return registred_users.get(username);
+        }
         User u = new User(username, password);
         this.registred_users.put(username, u);
+        logger.info("Registrado correctamente");
         return u;
     }
 
@@ -58,16 +67,24 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public User setObject() {
+    public User setObject(String username) {
+        logger.info("Añadiendo objetos por defecto al usuario " + username);
 
-        for (int i = 0; i<this.registred_users.size(); i++) {
-            User u =  this.registred_users.get(this.registred_users.keySet().toArray()[i]);
-            //añadir todos los objetos de GameObject
-            for(GameObject o : objects){
-                u.setMyobjects(o);
-            }
+        User u = this.registred_users.get(username);
+        if (u == null) {
+            logger.error("Usuario no encontrado: " + username);
+            return null;
         }
 
+        // Solo añadir objetos si el usuario no tiene ninguno aún
+        if (u.getMyobjects().isEmpty()) {
+            for (GameObject o : this.objects) {
+                u.setMyobjects(o);
+            }
+            logger.info("Objetos por defecto añadidos al usuario " + username);
+        } else {
+            logger.info("El usuario " + username + " ya tiene objetos asignados, no se añaden de nuevo.");
+        }
 
         return null;
     }
