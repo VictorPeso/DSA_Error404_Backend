@@ -54,13 +54,16 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public GameObject addNewObjeto(String nombre, String descripcion) {
+        logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
         GameObject o = new GameObject(nombre, descripcion);
         this.objects.add(o);
+        logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado correctamente");
         return o;
     }
 
     @Override
     public List<GameObject> getListObjects(String username) {
+        logger.info("Obtener todos los objetos del usuario  "+username);
         User u = registred_users.get(username);
         List<GameObject> list = u.getMyobjects();
         return list;
