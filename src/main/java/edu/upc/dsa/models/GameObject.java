@@ -1,20 +1,16 @@
 package edu.upc.dsa.models;
 
-import edu.upc.dsa.util.RandomUtils;
-
 import java.util.UUID;
 
-public class Object {
+public class GameObject {
 
     String id;
     String nombre;
     String descripcion;
 
-    public Object() {
+    public GameObject() {}
 
-    }
-
-    public Object(String nombre, String descripcion) {
+    public GameObject(String nombre, String descripcion) {
         this.id = UUID.randomUUID().toString();
         this.nombre = nombre;
         this.descripcion = descripcion;

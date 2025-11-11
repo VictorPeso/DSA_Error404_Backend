@@ -1,6 +1,7 @@
 package edu.upc.dsa.models;
 
-import edu.upc.dsa.util.RandomUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
 
@@ -8,17 +9,16 @@ public class User {
     String password;
     int ActFrag;
     int BestScore;
+    List<GameObject> myobjects;
 
-
-    public User() {
-
-    }
+    public User() {}
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.ActFrag = 0;
         this.BestScore = 0;
+        myobjects = new ArrayList<GameObject>();
     }
 
     public String getUsername() {
@@ -52,6 +52,10 @@ public class User {
     public void setBestScore(int bestScore) {
         BestScore = bestScore;
     }
+
+    public List<GameObject> getMyobjects() {return myobjects;}
+
+    public void setMyobjects(GameObject newobj) {this.myobjects.add(newobj);}
 
 //    @Override
 //    public String toString() {
