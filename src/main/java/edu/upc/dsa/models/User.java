@@ -5,13 +5,14 @@ import java.util.List;
 
 public class User {
 
-    String username;
-    String password;
-    int ActFrag;
-    int BestScore;
-    List<GameObject> myobjects;
+    private String username;
+    private String password;
+    private int ActFrag;
+    private int BestScore;
+    private List<GameObject> myobjects;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String password) {
         this.username = username;
@@ -53,9 +54,22 @@ public class User {
         BestScore = bestScore;
     }
 
-    public List<GameObject> getMyobjects() {return myobjects;}
+    public List<GameObject> getMyobjects() {
+        return this.myobjects;
+    }
 
-    public void setMyobjects(GameObject newobj) {this.myobjects.add(newobj);}
+    public void setMyobjects(GameObject newobj) {
+        this.myobjects.add(newobj);
+    }
+
+    public boolean CheckObject(GameObject newobj) {
+        for (GameObject o : this.myobjects) {
+            if (o.equals(newobj)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 //    @Override
 //    public String toString() {

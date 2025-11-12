@@ -21,8 +21,7 @@
                     return;
                 }
 
-                // URL del backend Java
-                const url = "http://localhost:8080/swagger/#/game/registerUser";
+                const url = "http://localhost:8080/dsaApp/game/users/register";
 
                 fetch(url, {
                     method: "POST",
@@ -30,8 +29,8 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        username: username,
-                        password: password
+                        "nombre": username,
+                        "password": password
                     })
                 })
                     .then(response => {
@@ -40,12 +39,12 @@
                         } else if (response.status === 409) {
                             throw new Error("El usuario ya existe");
                         } else {
-                            throw new Error("Error en el registro");
+                            throw new Error("Error en el registro (status: " + response.status + ")");
                         }
                     })
                     .then(data => {
                         alert("Usuario registrado correctamente: " + data.username);
-                        window.location.href = "Shop.html";
+                        window.location.href = "login.html";
                     })
                     .catch(error => {
                         alert("Error: " + error.message);

@@ -3,17 +3,18 @@ package edu.upc.dsa.models;
 import java.util.UUID;
 
 public class GameObject {
-
-    String id;
-    String nombre;
-    String descripcion;
+    private String id;
+    private String nombre;
+    private String descripcion;
+    private Objects tipo;
 
     public GameObject() {}
 
-    public GameObject(String nombre, String descripcion) {
+    public GameObject(String nombre, String descripcion, Objects tipo) {
         this.id = UUID.randomUUID().toString();
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.tipo = tipo;
     }
 
     public String getId() {
@@ -38,6 +39,14 @@ public class GameObject {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public Objects getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(Objects tipo) {
+        this.tipo = tipo;
     }
 
 }

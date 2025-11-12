@@ -1,5 +1,6 @@
 package edu.upc.dsa;
 
+import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.GameObject;
 import org.apache.log4j.Logger;
@@ -53,9 +54,9 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public GameObject addNewObjeto(String nombre, String descripcion) {
+    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo) {
         logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
-        GameObject o = new GameObject(nombre, descripcion);
+        GameObject o = new GameObject(nombre, descripcion, tipo);
         this.objects.add(o);
         logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado correctamente");
         return o;
@@ -65,30 +66,45 @@ public class GameManagerImpl implements GameManager {
     public List<GameObject> getListObjects(String username) {
         logger.info("Obtener todos los objetos del usuario  "+username);
         User u = registred_users.get(username);
+        if (u == null) return null;
         List<GameObject> list = u.getMyobjects();
         return list;
     }
 
     @Override
-    public User setObject(String username) {
-        logger.info("Añadiendo objetos por defecto al usuario " + username);
+    public User addObjectToUser(String username, String objectId) {
+        logger.info("Añadiendo objeto " + objectId + " al usuario " + username);
 
         User u = this.registred_users.get(username);
+        GameObject o = this.getStoreObject(objectId);
+
         if (u == null) {
             logger.error("Usuario no encontrado: " + username);
             return null;
         }
-
-        // Solo añadir objetos si el usuario no tiene ninguno aún
-        if (u.getMyobjects().isEmpty()) {
-            for (GameObject o : this.objects) {
-                u.setMyobjects(o);
-            }
-            logger.info("Objetos por defecto añadidos al usuario " + username);
-        } else {
-            logger.info("El usuario " + username + " ya tiene objetos asignados, no se añaden de nuevo.");
+        if (o == null) {
+            logger.error("Objeto no encontrado en la tienda: " + objectId);
+            return null;
         }
 
+        if (u.CheckObject(o)) {
+            logger.info("El usuario " + username + " ya tiene este objeto.");
+        } else {
+            u.setMyobjects(o);
+            logger.info("Objeto " + objectId + " añadido al usuario " + username);
+        }
+
+        return u;
+    }
+
+    public GameObject getStoreObject(String id) {
+        logger.info("Buscando objeto en la lista de objetos: " + id);
+        for (GameObject o : this.objects) {
+            if (o.getNombre().equals(id)) {
+                return o;
+            }
+        }
+        logger.error("Objeto " + id + " no encontrado en la lista de objeto");
         return null;
     }
 

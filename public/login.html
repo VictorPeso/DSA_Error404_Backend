@@ -10,12 +10,50 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
-            $("#login-btn").click(function(){
-                window.location.href = "Shop.html";
+
+            $("#login-btn").click(function(e){
+                e.preventDefault();
+
+                const username = $("input[name='username']").val();
+                const password = $("input[name='password']").val();
+
+                if (!username || !password) {
+                    alert("Por favor, completa todos los campos.");
+                    return;
+                }
+
+                const url = "http://localhost:8080/dsaApp/game/users/login";
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "nombre": username,
+                        "password": password
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error("Usuario o contraseña incorrectos");
+                        }
+                    })
+                    .then(data => {
+
+                        localStorage.setItem("loggedInUser", data.username);
+
+                        window.location.href = "shop.html";
+                    })
+                    .catch(error => {
+                        alert("Error: " + error.message);
+                    });
             });
 
             $("#registro-btn").click(function(){
-                window.location.href = "Register.html";
+                window.location.href = "register.html";
             });
         });
     </script>
