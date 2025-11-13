@@ -123,8 +123,9 @@ public class GameManagerImpl implements GameManager {
 
     public GameObject getStoreObject(String id) {
         logger.info("Buscando objeto en la lista de objetos: " + id);
-        for (GameObject o : this.objects) {
-            if (o.getId().equals(id)) {
+
+        for (GameObject o : registred_objects.values()) {
+            if (o.getNombre().equals(id)) {
                 return o;
             }
         }
