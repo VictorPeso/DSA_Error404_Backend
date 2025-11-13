@@ -13,9 +13,12 @@ public interface GameManager {
     public User Register(String username, String password) throws Exception;
     public Object addNewObjeto(String nombre, String descripcion, Objects tipo);
 
-    //Prueba: consultar lista de objetos de un usuario
+    //Objetos
     public List<GameObject> getListObjects(String username);
     public User addObjectToUser(String username, String objectId);
+    public String getObjectId(String objectName);
 
-
+    //JUnit
+    public int getNumberOfUsersRegistered();
+    public User getUser(String username);
 }

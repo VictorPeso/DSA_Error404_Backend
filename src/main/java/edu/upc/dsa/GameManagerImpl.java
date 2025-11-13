@@ -13,12 +13,16 @@ import java.util.Map;
 public class GameManagerImpl implements GameManager {
     private static GameManager instance;
     //protected List<User> registred_users;
+    //key: username
     protected Map<String, User> registred_users;
+    //key: object name
+    protected Map<String, GameObject> registred_objects;
     protected List<GameObject> objects;
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
 
     private GameManagerImpl() {
         this.registred_users = new HashMap<>();
+        this.registred_objects = new HashMap<>();
         this.objects = new LinkedList<>();
     }
 
@@ -58,7 +62,8 @@ public class GameManagerImpl implements GameManager {
         logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
         GameObject o = new GameObject(nombre, descripcion, tipo);
         this.objects.add(o);
-        logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado correctamente");
+        this.registred_objects.put(nombre, o);
+        logger.info("Nuevo objeto "+nombre+" "+descripcion + " " + o.getId() + " " +"creado correctamente");
         return o;
     }
 
@@ -97,10 +102,29 @@ public class GameManagerImpl implements GameManager {
         return u;
     }
 
+    @Override
+    public String getObjectId(String objectName) {
+        logger.info("Obtener el objeto id de "+objectName);
+        GameObject o = this.registred_objects.get(objectName);
+        return o.getId();
+    }
+
+    @Override
+    public User getUser(String username) {
+        User u =  this.registred_users.get(username);
+        return u;
+    }
+
+    //------------------------------------------------
+    public int getNumberOfUsersRegistered(){
+        int i = registred_users.size();
+        return i;
+    }
+
     public GameObject getStoreObject(String id) {
         logger.info("Buscando objeto en la lista de objetos: " + id);
         for (GameObject o : this.objects) {
-            if (o.getNombre().equals(id)) {
+            if (o.getId().equals(id)) {
                 return o;
             }
         }

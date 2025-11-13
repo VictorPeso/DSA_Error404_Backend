@@ -1,5 +1,5 @@
 package edu.upc.dsa.models;
 
 public enum Objects {
-    POCION, ESCUDO, ESPADA
+    POCION, ESCUDO, ESPADA;
 }
