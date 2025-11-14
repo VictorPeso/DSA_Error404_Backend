@@ -10,6 +10,8 @@ public class User {
     private int ActFrag;
     private int BestScore;
     private List<GameObject> myobjects;
+    private int vidaInicial;
+    private int monedas;
 
     public User() {
     }
@@ -19,6 +21,8 @@ public class User {
         this.password = password;
         this.ActFrag = 0;
         this.BestScore = 0;
+        this.vidaInicial = 0;
+        this.monedas = 0;
         myobjects = new ArrayList<GameObject>();
     }
 
@@ -62,6 +66,22 @@ public class User {
         this.myobjects.add(newobj);
     }
 
+    public int getVidaInicial() {
+        return vidaInicial;
+    }
+
+    public void setVidaInicial(int vidaInicial) {
+        this.vidaInicial = vidaInicial;
+    }
+
+    public int getMonedas() {
+        return monedas;
+    }
+
+    public void setMonedas(int monedas) {
+        this.monedas = monedas;
+    }
+
     public boolean CheckObject(GameObject newobj) {
         for (GameObject o : this.myobjects) {
             if (o.equals(newobj)) {
@@ -70,12 +90,4 @@ public class User {
         }
         return false;
     }
-
-//    @Override
-//    public String toString() {
-//        return "Track [id="+id+", title=" + title + ", singer=" + singer +"]";
-//    }
-
-
-
 }

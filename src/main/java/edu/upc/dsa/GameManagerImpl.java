@@ -52,6 +52,8 @@ public class GameManagerImpl implements GameManager {
             return registred_users.get(username);
         }
         User u = new User(username, password);
+        u.setVidaInicial(100);
+        u.setMonedas(0);
         this.registred_users.put(username, u);
         logger.info("Registrado correctamente");
         return u;
@@ -132,6 +134,4 @@ public class GameManagerImpl implements GameManager {
         logger.error("Objeto " + id + " no encontrado en la lista de objeto");
         return null;
     }
-
-
 }
