@@ -15,9 +15,9 @@ public class gameManagerTest {
     @Before
     public void setUp() throws Exception {
         this.gm = GameManagerImpl.getInstance();
-        gm.addNewObjeto("Espada", "Corta dragones", ESPADA);
-        gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO);
-        gm.addNewObjeto("Pocion", "Recupera energía", POCION);
+        gm.addNewObjeto("Espada", "Corta dragones", ESPADA, 10);
+        gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO, 20);
+        gm.addNewObjeto("Pocion", "Recupera energía", POCION, 30);
     }
 
     @After

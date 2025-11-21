@@ -60,9 +60,9 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo) {
+    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, double precio) {
         logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
-        GameObject o = new GameObject(nombre, descripcion, tipo);
+        GameObject o = new GameObject(nombre, descripcion, tipo,  precio);
         this.objects.add(o);
         this.registred_objects.put(nombre, o);
         logger.info("Nuevo objeto "+nombre+" "+descripcion + " " + o.getId() + " " +"creado correctamente");

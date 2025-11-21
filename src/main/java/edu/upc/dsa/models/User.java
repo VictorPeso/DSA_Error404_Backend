@@ -21,8 +21,8 @@ public class User {
         this.password = password;
         this.ActFrag = 0;
         this.BestScore = 0;
-        this.vidaInicial = 0;
-        this.monedas = 0;
+        this.vidaInicial = 100;
+        this.monedas = 50;
         myobjects = new ArrayList<GameObject>();
     }
 

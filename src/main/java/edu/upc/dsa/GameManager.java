@@ -11,7 +11,7 @@ public interface GameManager {
 
     public User LogIn(String username, String password) throws Exception;
     public User Register(String username, String password) throws Exception;
-    public Object addNewObjeto(String nombre, String descripcion, Objects tipo);
+    public Object addNewObjeto(String nombre, String descripcion, Objects tipo, double precio);
 
     //Objetos
     public List<GameObject> getListObjects(String username);
