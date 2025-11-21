@@ -31,9 +31,9 @@ public class GameService {
         this.gm = GameManagerImpl.getInstance();
 
         // if (this.gm.shopSize() == 0) {
-        gm.addNewObjeto("Espada", "Corta dragones", ESPADA);
-        gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO);
-        gm.addNewObjeto("Pocion", "Recupera energía", POCION);
+        gm.addNewObjeto("Espada", "Corta dragones", ESPADA,34);
+        gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO,56);
+        gm.addNewObjeto("Pocion", "Recupera energía", POCION,23);
         // }
     }
 
