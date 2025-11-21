@@ -44,14 +44,17 @@ public class GameManagerImpl implements GameManager {
         return u;
     }
 
-    @Override
-    public User Register(String username, String password) throws Exception {
-        logger.info("registrar el usuario " + username);
+    public User Register(String username, String password, String email) throws Exception {
+        logger.info("registrar el usuario " + username + " " + email);
         if (registred_users.containsKey(username)) {
             logger.error("el usuario " + username + " ya existe");
             return registred_users.get(username);
         }
-        User u = new User(username, password);
+        else if (registred_users.containsKey(email)){
+            logger.error("el correo " + email + " ya esta registrado");
+            return registred_users.get(email);
+        }
+        User u = new User(username, password, email);
         u.setVidaInicial(100);
         u.setMonedas(0);
         this.registred_users.put(username, u);

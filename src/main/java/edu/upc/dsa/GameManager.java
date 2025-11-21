@@ -10,7 +10,7 @@ import java.util.List;
 public interface GameManager {
 
     public User LogIn(String username, String password) throws Exception;
-    public User Register(String username, String password) throws Exception;
+    public User Register(String username, String password, String email) throws Exception;
     public Object addNewObjeto(String nombre, String descripcion, Objects tipo, double precio);
 
     //Objetos

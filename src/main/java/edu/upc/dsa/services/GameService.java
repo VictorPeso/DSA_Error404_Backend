@@ -8,6 +8,7 @@ import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.dto.Credentials;
 import edu.upc.dsa.models.dto.AddObject;
 
+import edu.upc.dsa.models.dto.RegisterCredentials;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -45,18 +46,19 @@ public class GameService {
     @ApiResponses({
             @ApiResponse(code = 201, message = "Usuario creado", response = User.class),
             @ApiResponse(code = 409, message = "Usuario ya existe"),
+            @ApiResponse(code = 410, message = "Correo ya registardo"),
             @ApiResponse(code = 400, message = "Faltan datos")
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerUser(Credentials credentials) {
+    public Response registerUser(RegisterCredentials credentials) {
 
-        if (credentials.getNombre() == null || credentials.getPassword() == null) {
-            return Response.status(400).entity("Faltan nombre o password").build();
+        if (credentials.getNombre() == null || credentials.getPassword() == null || credentials.getEmail() == null) {
+            return Response.status(400).entity("Faltan datos obligatorios").build();
         }
 
         try {
-            User u = gm.Register(credentials.getNombre(), credentials.getPassword());
+            User u = gm.Register(credentials.getNombre(), credentials.getPassword(), credentials.getEmail());
             return Response.status(Response.Status.CREATED).entity(u).build();
         } catch (Exception e) {
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
