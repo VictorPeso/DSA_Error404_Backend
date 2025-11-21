@@ -87,6 +87,22 @@ public class GameService {
         }
     }
 
+    @GET
+    @Path("/users/{nombre}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Obtener perfil de usuario (monedas, etc)", response = User.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = User.class),
+            @ApiResponse(code = 404, message = "Usuario no encontrado")
+    })
+    public Response getUserProfile(@PathParam("nombre") String nombre) {
+        User u = this.gm.getUser(nombre);
+        if (u == null) {
+            return Response.status(404).entity("Usuario no encontrado").build();
+        }
+        return Response.status(200).entity(u).build();
+    }
+
     // ------------------- TIENDA -------------------
 
     @GET
@@ -132,5 +148,42 @@ public class GameService {
         }
 
         return Response.status(Response.Status.OK).entity(updatedUser).build();
+    }
+
+    @POST
+    @Path("/users/objects/buy")
+    @ApiOperation(value = "Comprar un objeto")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Compra realizada", response = User.class),
+            @ApiResponse(code = 404, message = "Usuario u Objeto no encontrado"),
+            @ApiResponse(code = 402, message = "Saldo insuficiente"),
+            @ApiResponse(code = 400, message = "Faltan datos")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response buyObject(AddObject request) {
+
+        if (request.getNombre() == null || request.getObjectId() == null) {
+            return Response.status(400).entity("Falta nombre o objectId").build();
+        }
+
+        try {
+            User updatedUser = this.gm.purchaseObject(request.getNombre(), request.getObjectId());
+
+            return Response.status(200).entity(updatedUser).build();
+
+        } catch (Exception e) {
+            String mensaje = e.getMessage();
+
+            if (mensaje.equals("Saldo insuficiente")) {
+                return Response.status(402).entity("No tienes suficientes monedas").build();
+            }
+            else if (mensaje.equals("Usuario no encontrado") || mensaje.equals("Objeto no encontrado")) {
+                return Response.status(404).entity(mensaje).build();
+            }
+            else {
+                return Response.status(500).entity("Error interno").build();
+            }
+        }
     }
 }

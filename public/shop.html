@@ -24,13 +24,13 @@
             }
 
             $("#user-display").text(loggedInUser);
-            loadInventory(loggedInUser);
 
-            // LOGOUT CON TOAST
+            loadInventory(loggedInUser);
+            loadUserData(loggedInUser);
+
             $("#logout-btn").click(function(){
                 localStorage.removeItem("loggedInUser");
                 mostrarNotificacion("Cerrando sesión...", "exito");
-
                 setTimeout(() => {
                     window.location.href = "login.html";
                 }, 1500);
@@ -45,7 +45,7 @@
                     "objectId": objectId
                 };
 
-                fetch(API_URL + "/game/users/objects/add", {
+                fetch(API_URL + "/game/users/objects/buy", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(requestBody)
@@ -53,16 +53,23 @@
                     .then(response => {
                         if (response.ok) {
                             return response.json();
+                        } else if (response.status === 402) {
+                            throw new Error("¡No tienes suficientes monedas!");
+                        } else if (response.status === 404) {
+                            throw new Error("Objeto o usuario no encontrado");
                         } else {
-                            throw new Error("No tienes dinero suficiente o el objeto no existe");
+                            throw new Error("Error desconocido en la tienda");
                         }
                     })
                     .then(updatedUser => {
-                        mostrarNotificacion(`¡${objectId} comprado con éxito!`, "exito");
+                        mostrarNotificacion(`¡${objectId} comprado!`, "exito");
+
                         loadInventory(loggedInUser);
+
+                        $("#coin-display").text(updatedUser.monedas);
                     })
                     .catch(error => {
-                        mostrarNotificacion("Error: " + error.message, "error");
+                        mostrarNotificacion(error.message, "error");
                     });
             });
         });
@@ -71,47 +78,49 @@
             const listElement = $("#inventory-list");
             listElement.html('<li class="list-group-item list-group-item-dark text-center">Actualizando...</li>');
 
-            fetch(API_URL + "/game/users/objects/list?nombre=" + username, {
-                method: "GET"
-            })
-                .then(response => {
-                    if (response.ok) return response.json();
-                    else throw new Error("No se pudo cargar el inventario.");
-                })
+            fetch(API_URL + "/game/users/objects/list?nombre=" + username)
+                .then(response => response.ok ? response.json() : [])
                 .then(items => {
                     listElement.empty();
-
                     if (items.length === 0) {
                         listElement.append('<li class="list-group-item list-group-item-dark text-muted">Inventario vacío</li>');
                     } else {
                         items.forEach(item => {
                             listElement.append(`
-                            <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
-                                <span><i class="fas fa-box me-2"></i> ${item.nombre}</span>
-                            </li>
-                        `);
+                                <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-box me-2"></i> ${item.nombre}</span>
+                                </li>
+                            `);
                         });
                     }
+                });
+        }
+
+        function loadUserData(username) {
+            fetch(API_URL + "/game/users/" + username)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error("No se pudo cargar el usuario");
+                    }
+                })
+                .then(user => {
+                    $("#coin-display").text(user.monedas);
                 })
                 .catch(error => {
-                    listElement.empty().append('<li class="list-group-item list-group-item-danger">Error al cargar inventario.</li>');
-                    mostrarNotificacion("Error de red al cargar inventario", "error");
+                    console.error("Error cargando monedas:", error);
+                    $("#coin-display").text("Error");
                 });
         }
 
         function mostrarNotificacion(mensaje, tipo) {
             const toastElement = document.getElementById('miToast');
             const toastBody = document.getElementById('toastBody');
-
             toastBody.textContent = mensaje;
 
             toastElement.classList.remove('text-bg-danger', 'text-bg-success');
-
-            if (tipo === "exito") {
-                toastElement.classList.add('text-bg-success');
-            } else {
-                toastElement.classList.add('text-bg-danger');
-            }
+            toastElement.classList.add(tipo === "exito" ? 'text-bg-success' : 'text-bg-danger');
 
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
@@ -126,10 +135,15 @@
 
             <div class="card-header d-flex justify-content-between align-items-center border-bottom border-secondary pb-3">
                 <h3 class="m-0"><i class="fas fa-store me-2"></i>Tienda</h3>
-                <div>
-                    <span class="me-3 text-info"><i class="fas fa-user me-1"></i> <span id="user-display">...</span></span>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="badge bg-warning text-dark p-2 fs-6">
+                        <i class="fas fa-coins"></i> <span id="coin-display">...</span>
+                    </div>
+
+                    <span class="text-info fw-bold"><i class="fas fa-user me-1"></i> <span id="user-display">...</span></span>
+
                     <button type="button" class="btn btn-outline-danger btn-sm" id="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Salir
+                        <i class="fas fa-sign-out-alt"></i>
                     </button>
                 </div>
             </div>
@@ -138,34 +152,44 @@
 
                 <h5 class="text-uppercase text-muted mb-3 small">Objetos Disponibles</h5>
                 <ul class="list-group mb-4">
+
                     <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
                         <div>
                             <strong><i class="fas fa-khanda me-2"></i>Espada</strong>
-                            <small class="d-block text-muted">Corta dragones</small>
+                            <small class="d-block text-muted">+Daño</small>
                         </div>
-                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Espada">
-                            <i class="fas fa-cart-plus"></i> Añadir
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark text-warning">50 <i class="fas fa-coins"></i></span>
+                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Espada">
+                                Comprar
+                            </button>
+                        </div>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
                         <div>
                             <strong><i class="fas fa-shield-alt me-2"></i>Escudo</strong>
-                            <small class="d-block text-muted">Resistente al fuego</small>
+                            <small class="d-block text-muted">+Protección</small>
                         </div>
-                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Escudo">
-                            <i class="fas fa-cart-plus"></i> Añadir
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark text-warning">25 <i class="fas fa-coins"></i></span>
+                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Escudo">
+                                Comprar
+                            </button>
+                        </div>
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
                         <div>
                             <strong><i class="fas fa-flask me-2"></i>Pocion</strong>
-                            <small class="d-block text-muted">Recupera energía</small>
+                            <small class="d-block text-muted">+Salud</small>
                         </div>
-                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Pocion">
-                            <i class="fas fa-cart-plus"></i> Añadir
-                        </button>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark text-warning">10 <i class="fas fa-coins"></i></span>
+                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Pocion">
+                                Comprar
+                            </button>
+                        </div>
                     </li>
                 </ul>
 
@@ -183,8 +207,7 @@
 <div class="toast-container position-fixed top-0 end-0 p-3">
     <div id="miToast" class="toast border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
-            <div class="toast-body fw-bold" id="toastBody">
-            </div>
+            <div class="toast-body fw-bold" id="toastBody"></div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
     </div>

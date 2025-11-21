@@ -7,11 +7,11 @@ public class GameObject {
     private String nombre;
     private String descripcion;
     private Objects tipo;
-    private double precio;
+    private int precio;
 
     public GameObject() {}
 
-    public GameObject(String nombre, String descripcion, Objects tipo,  double precio) {
+    public GameObject(String nombre, String descripcion, Objects tipo,  int precio) {
         this.id = UUID.randomUUID().toString();
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -49,6 +49,14 @@ public class GameObject {
 
     public void setTipo(Objects tipo) {
         this.tipo = tipo;
+    }
+
+    public int getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(int precio) {
+        this.precio = precio;
     }
 
 }

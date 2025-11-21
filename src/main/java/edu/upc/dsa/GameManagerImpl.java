@@ -63,7 +63,7 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, double precio) {
+    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, int precio) {
         logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
         GameObject o = new GameObject(nombre, descripcion, tipo,  precio);
         this.objects.add(o);
@@ -83,28 +83,47 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public User addObjectToUser(String username, String objectId) {
+        User u = this.registred_users.get(username);
+        GameObject o = this.getStoreObject(objectId);
+
+        if (u == null || o == null) return null;
+
+        if (u.CheckObject(o)) {
+            logger.info("El usuario ya tiene el objeto");
+        } else {
+            u.setMyobjects(o);
+        }
+        return u;
+    }
+
+    public User purchaseObject(String username, String objectId) throws Exception {
         logger.info("Añadiendo objeto " + objectId + " al usuario " + username);
 
         User u = this.registred_users.get(username);
+
         GameObject o = this.getStoreObject(objectId);
 
         if (u == null) {
             logger.error("Usuario no encontrado: " + username);
+
             return null;
         }
+
         if (o == null) {
             logger.error("Objeto no encontrado en la tienda: " + objectId);
+
             return null;
         }
 
-        if (u.CheckObject(o)) {
-            logger.info("El usuario " + username + " ya tiene este objeto.");
-        } else {
-            u.setMyobjects(o);
-            logger.info("Objeto " + objectId + " añadido al usuario " + username);
+        if (u.getMonedas() < o.getPrecio()) {
+            throw new Exception("Saldo insuficiente");
         }
 
-        return u;
+        int nuevoSaldo = u.getMonedas() - o.getPrecio();
+        u.setMonedas(nuevoSaldo);
+
+        logger.info("Compra realizada. Nuevo saldo: " + nuevoSaldo);
+        return this.addObjectToUser(username, objectId);
     }
 
     @Override
