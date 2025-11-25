@@ -12,6 +12,7 @@ import static edu.upc.dsa.models.Objects.*;
 
 public class gameManagerTest {
     GameManager gm;
+
     @Before
     public void setUp() throws Exception {
         this.gm = GameManagerImpl.getInstance();
@@ -27,20 +28,20 @@ public class gameManagerTest {
 
     @Test
     public void TestRegister() throws Exception {
-        this.gm.Register("name1", "1");
-        this.gm.Register("name2", "2");
-        this.gm.Register("name3", "3");
+        this.gm.Register("name1", "1", "name1@example.com");
+        this.gm.Register("name2", "2", "name2@example.com");
+        this.gm.Register("name3", "3", "name3@example.com");
 
-        Assert.assertEquals(3, gm.getNumberOfUsersRegistered() );
+        Assert.assertEquals(3, gm.getNumberOfUsersRegistered());
 
         tearDown();
     }
 
     @Test
     public void TestLogin() throws Exception {
-        this.gm.Register("name1", "1");
-        this.gm.Register("name2", "2");
-        this.gm.Register("name3", "3");
+        this.gm.Register("name1", "1", "name1@example.com");
+        this.gm.Register("name2", "2", "name2@example.com");
+        this.gm.Register("name3", "3", "name3@example.com");
 
         User u = gm.getUser("name1");
 
@@ -52,9 +53,9 @@ public class gameManagerTest {
 
     @Test
     public void TestGetObjectList() throws Exception {
-        this.gm.Register("name1", "1");
-        this.gm.Register("name2", "2");
-        this.gm.Register("name3", "3");
+        this.gm.Register("name1", "1", "name1@example.com");
+        this.gm.Register("name2", "2", "name2@example.com");
+        this.gm.Register("name3", "3", "name3@example.com");
 
         List<GameObject> l = gm.getListObjects("name1");
         Assert.assertEquals(0, l.size());
@@ -70,9 +71,9 @@ public class gameManagerTest {
 
     @Test
     public void TestSetObjectToUser() throws Exception {
-        this.gm.Register("name1", "1");
-        this.gm.Register("name2", "2");
-        this.gm.Register("name3", "3");
+        this.gm.Register("name1", "1", "name1@example.com");
+        this.gm.Register("name2", "2", "name2@example.com");
+        this.gm.Register("name3", "3", "name3@example.com");
 
         gm.addObjectToUser("name1", gm.getObjectId("Espada"));
         gm.addObjectToUser("name2", gm.getObjectId("Escudo"));
@@ -89,4 +90,3 @@ public class gameManagerTest {
         tearDown();
     }
 }
-

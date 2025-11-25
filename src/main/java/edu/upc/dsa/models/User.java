@@ -24,7 +24,7 @@ public class User {
         this.ActFrag = 0;
         this.BestScore = 0;
         this.vidaInicial = 100;
-        this.monedas = 50;
+        this.monedas = 100;
         myobjects = new ArrayList<GameObject>();
     }
 

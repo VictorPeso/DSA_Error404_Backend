@@ -13,6 +13,14 @@
 
     <script defer>
         $(document).ready(function(){
+
+            loggedInUser = localStorage.getItem("loggedInUser");
+
+            if (loggedInUser) {
+                window.location.href = "shop.html";
+                return;
+            }
+            
             $("#register-btn").click(function(e){
                 e.preventDefault();
 

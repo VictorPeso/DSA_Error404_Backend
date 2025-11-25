@@ -25,6 +25,7 @@
 
             $("#user-display").text(loggedInUser);
 
+            loadShopItems();
             loadInventory(loggedInUser);
             loadUserData(loggedInUser);
 
@@ -36,7 +37,7 @@
                 }, 1500);
             });
 
-            $(".buy-btn").click(function(e){
+            $("#shop-items-list").on("click", ".buy-btn", function(e){
                 e.preventDefault();
                 const objectId = $(this).data("id");
 
@@ -73,6 +74,51 @@
                     });
             });
         });
+
+        function loadShopItems() {
+            const listElement = $("#shop-items-list");
+            listElement.html('<li class="list-group-item list-group-item-secondary text-center">Cargando objetos...</li>');
+
+            fetch(API_URL + "/game/shop/objects")
+                .then(response => response.ok ? response.json() : [])
+                .then(items => {
+                    listElement.empty();
+                    if (items.length === 0) {
+                        listElement.append('<li class="list-group-item list-group-item-secondary text-muted">No hay objetos disponibles</li>');
+                    } else {
+                        items.forEach(item => {
+                            const iconClass = getIconForType(item.tipo);
+                            listElement.append(`
+                                <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
+                                    <div>
+                                        <strong><i class="${iconClass} me-2"></i>${item.nombre}</strong>
+                                        <small class="d-block text-muted">${item.descripcion}</small>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-dark text-warning">${item.precio} <i class="fas fa-coins"></i></span>
+                                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="${item.nombre}">
+                                            Comprar
+                                        </button>
+                                    </div>
+                                </li>
+                            `);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error cargando objetos de la tienda:", error);
+                    listElement.html('<li class="list-group-item list-group-item-secondary text-danger">Error al cargar objetos</li>');
+                });
+        }
+
+        function getIconForType(tipo) {
+            switch(tipo) {
+                case "ESPADA": return "fas fa-khanda";
+                case "ESCUDO": return "fas fa-shield-alt";
+                case "POCION": return "fas fa-flask";
+                default: return "fas fa-box";
+            }
+        }
 
         function loadInventory(username) {
             const listElement = $("#inventory-list");
@@ -151,46 +197,8 @@
             <div class="card-body w-100 pt-4">
 
                 <h5 class="text-uppercase text-muted mb-3 small">Objetos Disponibles</h5>
-                <ul class="list-group mb-4">
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
-                        <div>
-                            <strong><i class="fas fa-khanda me-2"></i>Espada</strong>
-                            <small class="d-block text-muted">+Daño</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-warning">50 <i class="fas fa-coins"></i></span>
-                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Espada">
-                                Comprar
-                            </button>
-                        </div>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
-                        <div>
-                            <strong><i class="fas fa-shield-alt me-2"></i>Escudo</strong>
-                            <small class="d-block text-muted">+Protección</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-warning">25 <i class="fas fa-coins"></i></span>
-                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Escudo">
-                                Comprar
-                            </button>
-                        </div>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-secondary">
-                        <div>
-                            <strong><i class="fas fa-flask me-2"></i>Pocion</strong>
-                            <small class="d-block text-muted">+Salud</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-warning">10 <i class="fas fa-coins"></i></span>
-                            <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="Pocion">
-                                Comprar
-                            </button>
-                        </div>
-                    </li>
+                <ul class="list-group mb-4" id="shop-items-list">
+                    <!-- Los objetos se cargarán dinámicamente aquí -->
                 </ul>
 
                 <hr class="text-secondary">

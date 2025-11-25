@@ -31,11 +31,11 @@ public class GameService {
     public GameService() {
         this.gm = GameManagerImpl.getInstance();
 
-        // if (this.gm.shopSize() == 0) {
-        gm.addNewObjeto("Espada", "Corta dragones", ESPADA,344);
-        gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO,56);
-        gm.addNewObjeto("Pocion", "Recupera energía", POCION,23);
-        // }
+        if (this.gm.getAllStoreObjects().size() == 0) {
+            gm.addNewObjeto("Espada", "Corta dragones", ESPADA, 344);
+            gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO, 56);
+            gm.addNewObjeto("Pocion", "Recupera energía", POCION, 23);
+        }
     }
 
     // ------------------- USUARIOS -------------------
@@ -106,9 +106,23 @@ public class GameService {
     // ------------------- TIENDA -------------------
 
     @GET
+    @Path("/shop/objects")
+    @ApiOperation(value = "Obtener todos los objetos disponibles en la tienda")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = GameObject.class, responseContainer = "List")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllShopObjects() {
+        List<GameObject> objects = this.gm.getAllStoreObjects();
+        GenericEntity<List<GameObject>> entity = new GenericEntity<List<GameObject>>(objects) {
+        };
+        return Response.status(200).entity(entity).build();
+    }
+
+    @GET
     @ApiOperation(value = "Obtener lista de objetos de un usuario")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful", response = GameObject.class, responseContainer="List"),
+            @ApiResponse(code = 200, message = "Successful", response = GameObject.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
     @Path("/users/objects/list")
@@ -121,7 +135,8 @@ public class GameService {
             return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
         }
 
-        GenericEntity<List<GameObject>> entity = new GenericEntity<List<GameObject>>(objects) {};
+        GenericEntity<List<GameObject>> entity = new GenericEntity<List<GameObject>>(objects) {
+        };
         return Response.status(Response.Status.OK).entity(entity).build();
     }
 
@@ -177,11 +192,9 @@ public class GameService {
 
             if (mensaje.equals("Saldo insuficiente")) {
                 return Response.status(402).entity("No tienes suficientes monedas").build();
-            }
-            else if (mensaje.equals("Usuario no encontrado") || mensaje.equals("Objeto no encontrado")) {
+            } else if (mensaje.equals("Usuario no encontrado") || mensaje.equals("Objeto no encontrado")) {
                 return Response.status(404).entity(mensaje).build();
-            }
-            else {
+            } else {
                 return Response.status(500).entity("Error interno").build();
             }
         }

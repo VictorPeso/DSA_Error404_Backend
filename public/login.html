@@ -14,6 +14,13 @@
     <script>
         $(document).ready(function(){
 
+            loggedInUser = localStorage.getItem("loggedInUser");
+
+            if (loggedInUser) {
+                window.location.href = "shop.html";
+                return;
+            }
+
             $("#login-btn").click(function(e){
                 e.preventDefault();
 

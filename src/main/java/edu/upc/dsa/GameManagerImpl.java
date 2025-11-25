@@ -12,10 +12,10 @@ import java.util.Map;
 
 public class GameManagerImpl implements GameManager {
     private static GameManager instance;
-    //protected List<User> registred_users;
-    //key: username
+    // protected List<User> registred_users;
+    // key: username
     protected Map<String, User> registred_users;
-    //key: object name
+    // key: object name
     protected Map<String, GameObject> registred_objects;
     protected List<GameObject> objects;
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
@@ -27,14 +27,14 @@ public class GameManagerImpl implements GameManager {
     }
 
     public static GameManager getInstance() {
-        if (instance==null) instance = new GameManagerImpl();
+        if (instance == null)
+            instance = new GameManagerImpl();
         return instance;
     }
 
-
     @Override
     public User LogIn(String username, String password) throws Exception {
-        logger.info("Iniciando sesión "+username);
+        logger.info("Iniciando sesión " + username);
         User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
             logger.error("Usuario o contraseña incorrectas");
@@ -48,15 +48,16 @@ public class GameManagerImpl implements GameManager {
         logger.info("registrar el usuario " + username + " " + email);
         if (registred_users.containsKey(username)) {
             logger.error("el usuario " + username + " ya existe");
-            return registred_users.get(username);
+            throw new Exception("El usuario ya existe");
         }
-        else if (registred_users.containsKey(email)){
-            logger.error("el correo " + email + " ya esta registrado");
-            return registred_users.get(email);
+        for (User existingUser : registred_users.values()) {
+            if (existingUser.getEmail().equals(email)) {
+                logger.error("el correo " + email + " ya esta registrado");
+                throw new Exception("El correo ya está registrado");
+            }
         }
+
         User u = new User(username, password, email);
-        u.setVidaInicial(100);
-        u.setMonedas(0);
         this.registred_users.put(username, u);
         logger.info("Registrado correctamente");
         return u;
@@ -64,19 +65,20 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, int precio) {
-        logger.info("Nuevo objeto "+nombre+" "+descripcion + "creado");
-        GameObject o = new GameObject(nombre, descripcion, tipo,  precio);
+        logger.info("Nuevo objeto " + nombre + " " + descripcion + "creado");
+        GameObject o = new GameObject(nombre, descripcion, tipo, precio);
         this.objects.add(o);
         this.registred_objects.put(nombre, o);
-        logger.info("Nuevo objeto "+nombre+" "+descripcion + " " + o.getId() + " " +"creado correctamente");
+        logger.info("Nuevo objeto " + nombre + " " + descripcion + " " + o.getId() + " " + "creado correctamente");
         return o;
     }
 
     @Override
     public List<GameObject> getListObjects(String username) {
-        logger.info("Obtener todos los objetos del usuario  "+username);
+        logger.info("Obtener todos los objetos del usuario  " + username);
         User u = registred_users.get(username);
-        if (u == null) return null;
+        if (u == null)
+            return null;
         List<GameObject> list = u.getMyobjects();
         return list;
     }
@@ -86,7 +88,8 @@ public class GameManagerImpl implements GameManager {
         User u = this.registred_users.get(username);
         GameObject o = this.getStoreObject(objectId);
 
-        if (u == null || o == null) return null;
+        if (u == null || o == null)
+            return null;
 
         if (u.CheckObject(o)) {
             logger.info("El usuario ya tiene el objeto");
@@ -128,19 +131,19 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public String getObjectId(String objectName) {
-        logger.info("Obtener el objeto id de "+objectName);
+        logger.info("Obtener el objeto id de " + objectName);
         GameObject o = this.registred_objects.get(objectName);
         return o.getId();
     }
 
     @Override
     public User getUser(String username) {
-        User u =  this.registred_users.get(username);
+        User u = this.registred_users.get(username);
         return u;
     }
 
-    //------------------------------------------------
-    public int getNumberOfUsersRegistered(){
+    // ------------------------------------------------
+    public int getNumberOfUsersRegistered() {
         int i = registred_users.size();
         return i;
     }
@@ -155,5 +158,11 @@ public class GameManagerImpl implements GameManager {
         }
         logger.error("Objeto " + id + " no encontrado en la lista de objeto");
         return null;
+    }
+
+    @Override
+    public List<GameObject> getAllStoreObjects() {
+        logger.info("Obteniendo todos los objetos de la tienda");
+        return this.objects;
     }
 }
