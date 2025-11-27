@@ -11,6 +11,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
+    <style>
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #ccc;
+        }
+        .strength-bar {
+            width: 100%;
+            height: 6px;
+            border-radius: 4px;
+            margin-top: 5px;
+            background: #555;
+        }
+    </style>
+
     <script defer>
         $(document).ready(function(){
 
@@ -20,7 +42,25 @@
                 window.location.href = "shop.html";
                 return;
             }
-            
+
+            $("#passwordField").on("input", function () {
+                evaluarFuerza($(this).val());
+            });
+
+            $("#togglePassword").click(function () {
+                const field = $("#passwordField");
+                const type = field.attr("type") === "password" ? "text" : "password";
+                field.attr("type", type);
+                $(this).toggleClass("fa-eye fa-eye-slash");
+            });
+
+            $("#togglePassword2").click(function () {
+                const field = $("#passwordField2");
+                const type = field.attr("type") === "password" ? "text" : "password";
+                field.attr("type", type);
+                $(this).toggleClass("fa-eye fa-eye-slash");
+            });
+
             $("#register-btn").click(function(e){
                 e.preventDefault();
 
@@ -44,6 +84,12 @@
                     mostrarNotificacion("Las contraseñas no coinciden.", "error");
                     $("input[name='password']").val("");
                     $("input[name='confirm_password']").val("");
+                    evaluarFuerza("");
+                    return;
+                }
+
+                if (!/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(password)) {
+                    mostrarNotificacion("Contraseña débil: debe tener mayúscula, minúscula, número y mínimo 8 caracteres.", "error");
                     return;
                 }
 
@@ -106,6 +152,21 @@
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
         }
+
+        function evaluarFuerza(pass) {
+            const bar = $("#strengthBar");
+            if (!pass) {
+                bar.css("background", "#555");
+            } else if (pass.length < 4) {
+                bar.css("background", "red");
+            } else if (pass.length < 8) {
+                bar.css("background", "yellow");
+            } else if (/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}/.test(pass)) {
+                bar.css("background", "green");
+            } else {
+                bar.css("background", "yellow");
+            }
+        }
     </script>
 
 </head>
@@ -132,17 +193,25 @@
                         <input type="email" class="form-control" placeholder="user@email.com" name="email">
                     </div>
 
-                    <div class="input-group mt-3">
-                        <span class="input-group-text bg-secondary text-white border-0">
-                            <i class="fas fa-key"></i>
-                        </span>
-                        <input type="password" class="form-control" placeholder="Contraseña" name="password">
+                    <div class="password-wrapper mt-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-secondary text-white border-0">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            <input type="password" class="form-control" placeholder="Contraseña" name="password" id="passwordField">
+                        </div>
+                        <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword"></i>
+                        <div class="strength-bar" id="strengthBar"></div>
                     </div>
 
-                    <div class="input-group mt-3">
-                        <span class="input-group-text bg-secondary text-white border-0">
-                            <i class="fas fa-lock"></i> </span>
-                        <input type="password" class="form-control" placeholder="Repetir Contraseña" name="confirm_password">
+                    <div class="password-wrapper mt-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-secondary text-white border-0">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" class="form-control" placeholder="Repetir Contraseña" name="confirm_password" id="passwordField2">
+                        </div>
+                        <i class="fa-solid fa-eye-slash toggle-password" id="togglePassword2"></i>
                     </div>
 
                     <div class="mt-4">
