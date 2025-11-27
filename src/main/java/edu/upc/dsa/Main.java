@@ -6,7 +6,7 @@ import io.swagger.jersey.listing.ApiListingResourceJSON;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
@@ -31,10 +31,8 @@ public class Main {
         // in edu.upc.dsa package
         final ResourceConfig rc = new ResourceConfig().packages("edu.upc.dsa.services");
 
-        // Register JSON provider
-        rc.register(MoxyJsonFeature.class);
+        rc.register(JacksonFeature.class);
 
-        // Register CORS Filter
         rc.register(CORSFilter.class);
 
         rc.register(io.swagger.jaxrs.listing.ApiListingResource.class);
