@@ -40,6 +40,7 @@
             $("#shop-items-list").on("click", ".buy-btn", function(e){
                 e.preventDefault();
                 const objectId = $(this).data("id");
+                const objectName = $(this).data("name");
 
                 const requestBody = {
                     "nombre": loggedInUser,
@@ -63,7 +64,7 @@
                         }
                     })
                     .then(updatedUser => {
-                        mostrarNotificacion(`¡${objectId} comprado!`, "exito");
+                        mostrarNotificacion(`¡${objectName} comprado!`, "exito");
 
                         loadInventory(loggedInUser);
 
@@ -96,7 +97,7 @@
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="badge bg-dark text-warning">${item.precio} <i class="fas fa-coins"></i></span>
-                                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="${item.nombre}">
+                                        <button class="btn btn-success btn-sm buy-btn shadow-sm" data-id="${item.id}" data-name="${item.nombre}">
                                             Comprar
                                         </button>
                                     </div>

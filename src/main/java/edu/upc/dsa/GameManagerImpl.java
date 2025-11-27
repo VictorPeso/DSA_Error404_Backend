@@ -34,6 +34,7 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public User LogIn(String username, String password) throws Exception {
+        username = username.toLowerCase();
         logger.info("Iniciando sesión " + username);
         User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
@@ -45,13 +46,15 @@ public class GameManagerImpl implements GameManager {
     }
 
     public User Register(String username, String password, String email) throws Exception {
+        username = username.toLowerCase();
+        email = email.toLowerCase();
         logger.info("registrar el usuario " + username + " " + email);
         if (registred_users.containsKey(username)) {
             logger.error("el usuario " + username + " ya existe");
             throw new Exception("El usuario ya existe");
         }
         for (User existingUser : registred_users.values()) {
-            if (existingUser.getEmail().equals(email)) {
+            if (existingUser.getEmail().equalsIgnoreCase(email)) {
                 logger.error("el correo " + email + " ya esta registrado");
                 throw new Exception("El correo ya está registrado");
             }
@@ -152,7 +155,7 @@ public class GameManagerImpl implements GameManager {
         logger.info("Buscando objeto en la lista de objetos: " + id);
 
         for (GameObject o : registred_objects.values()) {
-            if (o.getNombre().equals(id)) {
+            if (o.getId().equals(id)) {
                 return o;
             }
         }
