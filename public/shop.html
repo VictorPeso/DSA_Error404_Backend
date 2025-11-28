@@ -65,9 +65,7 @@
                     })
                     .then(updatedUser => {
                         mostrarNotificacion(`¡${objectName} comprado!`, "exito");
-
                         loadInventory(loggedInUser);
-
                         $("#coin-display").text(updatedUser.monedas);
                     })
                     .catch(error => {
@@ -132,10 +130,21 @@
                     if (items.length === 0) {
                         listElement.append('<li class="list-group-item list-group-item-dark text-muted">Inventario vacío</li>');
                     } else {
+                        const grouped = {};
                         items.forEach(item => {
+                            const key = item.id || item.nombre;
+                            if (!grouped[key]) {
+                                grouped[key] = { ...item, cantidad: 0 };
+                            }
+                            grouped[key].cantidad++;
+                        });
+
+                        Object.values(grouped).forEach(item => {
+                            const iconClass = getIconForType(item.tipo);
                             listElement.append(`
                                 <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-box me-2"></i> ${item.nombre}</span>
+                                    <span><i class="${iconClass} me-2"></i> ${item.nombre}</span>
+                                    <span class="badge bg-light text-dark">${item.cantidad}</span>
                                 </li>
                             `);
                         });
@@ -199,7 +208,6 @@
 
                 <h5 class="text-uppercase text-muted mb-3 small">Objetos Disponibles</h5>
                 <ul class="list-group mb-4" id="shop-items-list">
-                    <!-- Los objetos se cargarán dinámicamente aquí -->
                 </ul>
 
                 <hr class="text-secondary">
