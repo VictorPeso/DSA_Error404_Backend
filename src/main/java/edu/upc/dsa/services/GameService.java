@@ -9,6 +9,7 @@ import edu.upc.dsa.models.dto.Credentials;
 import edu.upc.dsa.models.dto.AddObject;
 
 import edu.upc.dsa.models.dto.RegisterCredentials;
+import edu.upc.dsa.models.dto.UserDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -59,10 +60,13 @@ public class GameService {
 
         try {
             User u = gm.Register(credentials.getNombre(), credentials.getPassword(), credentials.getEmail());
-            return Response.status(Response.Status.CREATED).entity(u).build();
-        } catch (Exception e) {
+            UserDTO userDTO = new UserDTO(u.getUsername(), u.getPassword(), u.getEmail());
+            return Response.status(Response.Status.CREATED).entity(userDTO).build();
+        } catch (Throwable e) {
+            e.printStackTrace();
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
         }
+
     }
 
     @POST
