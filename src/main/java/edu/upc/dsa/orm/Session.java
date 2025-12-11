@@ -10,4 +10,6 @@ public interface Session<E> {
     void update(Object object);                                         // crUd
     void delete(Object object);                                         // cruD     // cR
     List<Object> findAll(Class theClass, HashMap params);
+    List<Object> findAll_M2N(Class theClass, Class theClass2, String inter, HashMap params);
+    void save_M2N(Object entity, Object entity2, String relationTable);
 }

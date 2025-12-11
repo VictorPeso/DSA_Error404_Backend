@@ -61,7 +61,7 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
-    public void deleteEmployee(User user) {
+    public void deleteUser(User user) {
         Session session = null;
         try {
             session = FactorySession.openSession();
@@ -72,6 +72,41 @@ public class UserDAOImpl implements UserDAO {
             session.close();
         }
 
+    }
+
+     public List<GameObject> getObjectsbyUser(User user) {
+        Session session = null;
+        List<GameObject> objectList = null;
+        try {
+            session = FactorySession.openSession();
+            HashMap<Integer, String> hs = new HashMap<>();
+            hs.put(1,"user.username");
+            objectList = session.findAll_M2N(User.class, GameObject.class, "user_gameobject", hs);
+        }
+         catch (Exception e) {
+             logger.info("No se ha encontrado el usuario " + user.getUsername());
+        }
+        finally {
+            session.close();
+        }
+        return objectList;
+     }
+
+    public String buyItem(User user, GameObject obj) {
+        Session session = null;
+        try {
+            session = FactorySession.openSession();
+            session.save_M2N(user, obj, "user_gameobject");
+            logger.info("Usuario " + user.getUsername() + " registrado correctamente");
+        } catch (Exception e) {
+            logger.error("No se ha podido registrar el usuario " + user.getUsername(), e);
+            throw new RuntimeException("Error al registrar usuario", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return user.getUsername();
     }
 
     //

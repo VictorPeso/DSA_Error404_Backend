@@ -97,7 +97,8 @@ public class GameManagerImpl implements GameManager {
         User u = registred_users.get(username);
         if (u == null)
             return null;
-        List<GameObject> list = u.getMyobjects();
+        //List<GameObject> list = u.getMyobjects();
+        List<GameObject> list = dao.getObjectsbyUser(u);
         return list;
     }
 
@@ -114,6 +115,7 @@ public class GameManagerImpl implements GameManager {
 
             // temporal hasta nueva solucion
             u.setMyobjects(o);
+            dao.buyItem(u,o);
         } else {
             u.setMyobjects(o);
         }

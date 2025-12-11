@@ -178,4 +178,76 @@ public class SessionImpl implements Session {
         return resultList;
     }
 
+    public List<Object> findAll_M2N(Class theClass, Class theClass2, String inter, HashMap params) {
+        String selectQuery = QueryHelper.createqueryFINDALL_M2N(theClass, theClass2, inter, params);
+
+        PreparedStatement pstm = null;
+        List<Object> resultList = new ArrayList<>();
+
+        try {
+            pstm = conn.prepareStatement(selectQuery);
+
+
+            int index = 1;
+
+            for (Object key : params.keySet()) {
+                pstm.setObject(index, params.get(key));
+                index++;
+            }
+
+            ResultSet res = pstm.executeQuery();
+            ResultSetMetaData rsmd = res.getMetaData();
+            int numColumns = rsmd.getColumnCount();
+
+            while (res.next()) {
+                Object o = theClass.newInstance();
+
+                for (int i = 1; i <= numColumns; i++) {
+                    String colName = rsmd.getColumnName(i);
+                    Object value = res.getObject(i);
+                    ObjectHelper.setter(o, colName, value);
+                }
+
+                resultList.add(o);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resultList;
+    }
+
+    public void save_M2N(Object entity, Object entity2, String relationTable) {
+        String insertQuery = QueryHelper.createQueryINSERT_M2N(entity, entity2, relationTable);
+        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?, ?,?)
+
+        PreparedStatement pstm = null;
+
+        try {
+            pstm = conn.prepareStatement(insertQuery);
+
+            String [] fields1 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity);
+            String [] fields2 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity2);
+
+            pstm.setObject(1, ObjectHelper.getter(entity, fields1[0]));
+            pstm.setObject(2, ObjectHelper.getter(entity, fields2[0]));
+
+//            int i = 1;
+//            for (String field: ObjectHelper.getFields(entity)) {
+//                pstm.setObject(i++, ObjectHelper.getter(entity, field));
+//            }
+
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
 }

@@ -6,13 +6,11 @@ import java.util.List;
 
 public interface UserDAO {
 
-    public String addUser(User user);
-
-    public User getUser(String username);
-
-    public void updateUser(User user);
-
-    public void deleteEmployee(User user);
+    String addUser(User user);
+    User getUser(String username);
+    void updateUser(User user);
+    void deleteUser(User user);
+    List<GameObject> getObjectsbyUser(User user);
 
     // Optional methods - uncomment if needed:
     // public List<User> getUsers();
