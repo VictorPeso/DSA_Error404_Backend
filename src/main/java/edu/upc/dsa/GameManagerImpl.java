@@ -3,6 +3,8 @@ package edu.upc.dsa;
 import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.GameObject;
+import edu.upc.dsa.orm.*;
+import edu.upc.dsa.orm.dao.UserDAOImpl;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -18,12 +20,14 @@ public class GameManagerImpl implements GameManager {
     // key: object name
     protected Map<String, GameObject> registred_objects;
     protected List<GameObject> objects;
+    protected UserDAOImpl dao;
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
 
     private GameManagerImpl() {
         this.registred_users = new HashMap<>();
         this.registred_objects = new HashMap<>();
         this.objects = new LinkedList<>();
+        this.dao = new UserDAOImpl();
     }
 
     public static GameManager getInstance() {
@@ -36,7 +40,11 @@ public class GameManagerImpl implements GameManager {
     public User LogIn(String username, String password) throws Exception {
         username = username.toLowerCase();
         logger.info("Iniciando sesión " + username);
-        User u = registred_users.get(username);
+
+        //UserDAOImpl dao = new UserDAOImpl();
+        User u = dao.getUser(username);
+
+        //User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
             logger.error("Usuario o contraseña incorrectas");
             throw new Exception("Usuario o contraseña incorrectas");
@@ -62,6 +70,10 @@ public class GameManagerImpl implements GameManager {
 
         User u = new User(username, password, email);
         this.registred_users.put(username, u);
+
+        //serDAOImpl dao = new UserDAOImpl();
+        dao.addUser(u);
+
         logger.info("Registrado correctamente");
         return u;
     }

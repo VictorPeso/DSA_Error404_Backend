@@ -1,0 +1,181 @@
+package edu.upc.dsa.orm;
+
+import edu.upc.dsa.orm.Session;
+import edu.upc.dsa.orm.util.ObjectHelper;
+import edu.upc.dsa.orm.util.QueryHelper;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+
+public class SessionImpl implements Session {
+    private final Connection conn;
+
+    public SessionImpl(Connection conn) {
+        this.conn = conn;
+    }
+
+    public void save(Object entity) {
+        String insertQuery = QueryHelper.createQueryINSERT(entity);
+        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?, ?,?)
+
+        PreparedStatement pstm = null;
+
+        try {
+            pstm = conn.prepareStatement(insertQuery);
+            //pstm.setObject(1, 0);
+            int i = 1;
+            for (String field: ObjectHelper.getFields(entity)) {
+                pstm.setObject(i++, ObjectHelper.getter(entity, field));
+            }
+
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void close() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public Object get(Class theClass, Object ID) {
+        String selectQuery = QueryHelper.createQuerySELECT(theClass);
+        // SELECT * FROM Users WHERE username = ?
+        PreparedStatement pstm = null;
+        Object o = null;
+
+        try {
+            o = theClass.newInstance();
+            pstm = conn.prepareStatement(selectQuery);
+
+            pstm.setObject(1, ID);
+
+            ResultSet res = pstm.executeQuery();
+
+            ResultSetMetaData rsmd = res.getMetaData();
+            int numColumns = rsmd.getColumnCount();
+
+            if (res.next()) {
+                for (int i = 1; i <= numColumns; i++) { // Columnas empiezan en 1
+                    String key = rsmd.getColumnName(i);
+                    Object value = res.getObject(i);
+                    ObjectHelper.setter(o, key, value);
+                }
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return o;
+    }
+
+    public void update(Object object) {
+        String updateQuery = QueryHelper.createQueryUPDATE(object);
+
+        PreparedStatement pstm = null;
+
+        try {
+            pstm = conn.prepareStatement(updateQuery);
+            // UPDATE User SET lastName = ?, firstName = ?, address = ?, city = ? WHERE id = ?
+            String [] fields = ObjectHelper.getFields(object);
+            int i = 1;
+
+            // Primero los campos que van en el SET
+            for (String field : fields) {
+                if (!field.equals(fields[0])) {
+                    pstm.setObject(i++, ObjectHelper.getter(object, field));
+                }
+            }
+
+            Object condition = fields[0];
+            pstm.setObject(i, condition);
+//
+//            // Finalmente el ID para el WHERE
+//            Object idValue = ObjectHelper.getIdValue(object); // Asumiendo que tienes este helper
+//            pstm.setObject(i, idValue);
+//
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(Object object) {
+        String deleteQuery = QueryHelper.createQueryDELETE(object);
+        // DELETE FROM Users WHERE username = ?;
+
+        PreparedStatement pstm = null;
+
+        try {
+            pstm = conn.prepareStatement(deleteQuery);
+
+            String idValue = ObjectHelper.getFields(object)[0];
+            pstm.setObject(1, ObjectHelper.getter(object, idValue));
+
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Object> findAll(Class theClass, HashMap params) {
+        String selectQuery = QueryHelper.createqueryFINDALL(theClass, params);
+
+        PreparedStatement pstm = null;
+        List<Object> resultList = new ArrayList<>();
+
+        try {
+            pstm = conn.prepareStatement(selectQuery);
+
+
+            int index = 1;
+
+            for (Object key : params.keySet()) {
+                pstm.setObject(index, params.get(key));
+                index++;
+            }
+
+            ResultSet res = pstm.executeQuery();
+            ResultSetMetaData rsmd = res.getMetaData();
+            int numColumns = rsmd.getColumnCount();
+
+            while (res.next()) {
+                Object o = theClass.newInstance();
+
+                for (int i = 1; i <= numColumns; i++) {
+                    String colName = rsmd.getColumnName(i);
+                    Object value = res.getObject(i);
+                    ObjectHelper.setter(o, colName, value);
+                }
+
+                resultList.add(o);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resultList;
+    }
+
+}
