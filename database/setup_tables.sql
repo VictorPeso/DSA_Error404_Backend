@@ -20,21 +20,20 @@ CREATE TABLE IF NOT EXISTS GameObject (
 
 CREATE TABLE IF NOT EXISTS User_GameObject (
     username VARCHAR(50) NOT NULL,
-    object_id VARCHAR(10) NOT NULL,
-    PRIMARY KEY (username, object_id),
+    id VARCHAR(10) NOT NULL,
+    cantidad INT NOT NULL,
+    PRIMARY KEY (username, id),
     FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
-    FOREIGN KEY (object_id) REFERENCES GameObject(id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES GameObject(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE INDEX idx_user_email ON User(email);
 CREATE INDEX idx_gameobject_tipo ON GameObject(tipo);
 
 INSERT INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj01', 'Espada de Fuego', 'Una espada legendaria que causa daño de fuego', 'ARMA', 150),
-('obj02', 'Escudo Mágico', 'Escudo que absorbe daño mágico', 'DEFENSA', 120),
-('obj03', 'Poción de Vida', 'Restaura 50 puntos de vida', 'CONSUMIBLE', 30),
-('obj04', 'Armadura de Acero', 'Armadura resistente que aumenta la defensa', 'DEFENSA', 200),
-('obj05', 'Anillo de Velocidad', 'Aumenta la velocidad de movimiento', 'ACCESORIO', 80);
+('obj01', 'Espada de Fuego', 'Una espada legendaria que causa daño de fuego', 'ESPADA', 150),
+('obj02', 'Escudo Mágico', 'Escudo que absorbe daño mágico', 'ESCUDO', 120),
+('obj03', 'Poción de Vida', 'Restaura 50 puntos de vida', 'POCION', 30),
 
 INSERT INTO User (username, password, email, ActFrag, BestScore, vidaInicial, monedas) VALUES
 ('testuser', 'test123', 'test@example.com', 0, 0, 100, 500);

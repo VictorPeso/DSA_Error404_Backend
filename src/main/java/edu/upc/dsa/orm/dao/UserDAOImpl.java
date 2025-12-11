@@ -74,23 +74,26 @@ public class UserDAOImpl implements UserDAO {
 
     }
 
-     public List<GameObject> getObjectsbyUser(User user) {
+    public List<GameObject> getObjectsbyUser(User user) {
         Session session = null;
         List<GameObject> objectList = null;
         try {
             session = FactorySession.openSession();
-            HashMap<Integer, String> hs = new HashMap<>();
-            hs.put(1,"user.username");
-            objectList = session.findAll_M2N(User.class, GameObject.class, "user_gameobject", hs);
-        }
-         catch (Exception e) {
-             logger.info("No se ha encontrado el usuario " + user.getUsername());
-        }
-        finally {
-            session.close();
+            HashMap<String, String> hs = new HashMap<>();
+            hs.put("User.username", user.getUsername());
+            @SuppressWarnings("unchecked")
+            List<GameObject> result = (List<GameObject>) (List<?>) session.findAll_M2N(User.class, GameObject.class,
+                    "user_gameobject", hs);
+            objectList = result;
+        } catch (Exception e) {
+            logger.error("Error al obtener objetos del usuario " + user.getUsername(), e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
         return objectList;
-     }
+    }
 
     public String buyItem(User user, GameObject obj) {
         Session session = null;

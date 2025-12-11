@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 public class SessionImpl implements Session {
     private final Connection conn;
 
@@ -19,15 +18,16 @@ public class SessionImpl implements Session {
 
     public void save(Object entity) {
         String insertQuery = QueryHelper.createQueryINSERT(entity);
-        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?, ?,?)
+        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?,
+        // ?,?)
 
         PreparedStatement pstm = null;
 
         try {
             pstm = conn.prepareStatement(insertQuery);
-            //pstm.setObject(1, 0);
+            // pstm.setObject(1, 0);
             int i = 1;
-            for (String field: ObjectHelper.getFields(entity)) {
+            for (String field : ObjectHelper.getFields(entity)) {
                 pstm.setObject(i++, ObjectHelper.getter(entity, field));
             }
 
@@ -48,7 +48,6 @@ public class SessionImpl implements Session {
             e.printStackTrace();
         }
     }
-
 
     public Object get(Class theClass, Object ID) {
         String selectQuery = QueryHelper.createQuerySELECT(theClass);
@@ -75,7 +74,6 @@ public class SessionImpl implements Session {
                 }
             }
 
-
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -92,8 +90,9 @@ public class SessionImpl implements Session {
 
         try {
             pstm = conn.prepareStatement(updateQuery);
-            // UPDATE User SET lastName = ?, firstName = ?, address = ?, city = ? WHERE id = ?
-            String [] fields = ObjectHelper.getFields(object);
+            // UPDATE User SET lastName = ?, firstName = ?, address = ?, city = ? WHERE id =
+            // ?
+            String[] fields = ObjectHelper.getFields(object);
             int i = 1;
 
             // Primero los campos que van en el SET
@@ -105,11 +104,12 @@ public class SessionImpl implements Session {
 
             Object condition = fields[0];
             pstm.setObject(i, condition);
-//
-//            // Finalmente el ID para el WHERE
-//            Object idValue = ObjectHelper.getIdValue(object); // Asumiendo que tienes este helper
-//            pstm.setObject(i, idValue);
-//
+            //
+            // // Finalmente el ID para el WHERE
+            // Object idValue = ObjectHelper.getIdValue(object); // Asumiendo que tienes
+            // este helper
+            // pstm.setObject(i, idValue);
+            //
             pstm.executeUpdate();
 
         } catch (SQLException e) {
@@ -144,7 +144,6 @@ public class SessionImpl implements Session {
 
         try {
             pstm = conn.prepareStatement(selectQuery);
-
 
             int index = 1;
 
@@ -187,7 +186,6 @@ public class SessionImpl implements Session {
         try {
             pstm = conn.prepareStatement(selectQuery);
 
-
             int index = 1;
 
             for (Object key : params.keySet()) {
@@ -200,7 +198,8 @@ public class SessionImpl implements Session {
             int numColumns = rsmd.getColumnCount();
 
             while (res.next()) {
-                Object o = theClass.newInstance();
+                // Crear instancia de theClass2 porque la query hace SELECT theClass2.*
+                Object o = theClass2.newInstance();
 
                 for (int i = 1; i <= numColumns; i++) {
                     String colName = rsmd.getColumnName(i);
@@ -222,23 +221,24 @@ public class SessionImpl implements Session {
 
     public void save_M2N(Object entity, Object entity2, String relationTable) {
         String insertQuery = QueryHelper.createQueryINSERT_M2N(entity, entity2, relationTable);
-        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?, ?,?)
+        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?,
+        // ?,?)
 
         PreparedStatement pstm = null;
 
         try {
             pstm = conn.prepareStatement(insertQuery);
 
-            String [] fields1 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity);
-            String [] fields2 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity2);
+            String[] fields1 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity);
+            String[] fields2 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity2);
 
             pstm.setObject(1, ObjectHelper.getter(entity, fields1[0]));
-            pstm.setObject(2, ObjectHelper.getter(entity, fields2[0]));
+            pstm.setObject(2, ObjectHelper.getter(entity2, fields2[0]));
 
-//            int i = 1;
-//            for (String field: ObjectHelper.getFields(entity)) {
-//                pstm.setObject(i++, ObjectHelper.getter(entity, field));
-//            }
+            // int i = 1;
+            // for (String field: ObjectHelper.getFields(entity)) {
+            // pstm.setObject(i++, ObjectHelper.getter(entity, field));
+            // }
 
             pstm.executeUpdate();
 
@@ -247,7 +247,5 @@ public class SessionImpl implements Session {
         }
 
     }
-
-
 
 }

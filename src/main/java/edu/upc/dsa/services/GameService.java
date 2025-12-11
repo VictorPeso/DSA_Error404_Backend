@@ -32,11 +32,15 @@ public class GameService {
     public GameService() {
         this.gm = GameManagerImpl.getInstance();
 
-        if (this.gm.getAllStoreObjects().size() == 0) {
-            gm.addNewObjeto("Espada matadragones", "Corta dragones", ESPADA, 100);
-            gm.addNewObjeto("Escudo de hierro", "Escudo resistente", ESCUDO, 40);
-            gm.addNewObjeto("Pocion de curacion", "Recupera vida", POCION, 20);
-        }
+        // Objetos ahora se cargan desde la base de datos
+        // Los objetos se insertan con el script SQL setup_tables.sql
+        /*
+         * if (this.gm.getAllStoreObjects().size() == 0) {
+         * gm.addNewObjeto("Espada matadragones", "Corta dragones", ESPADA, 100);
+         * gm.addNewObjeto("Escudo de hierro", "Escudo resistente", ESCUDO, 40);
+         * gm.addNewObjeto("Pocion de curacion", "Recupera vida", POCION, 20);
+         * }
+         */
     }
 
     // ------------------- USUARIOS -------------------

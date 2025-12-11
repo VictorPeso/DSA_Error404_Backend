@@ -52,11 +52,16 @@ public class GameObject {
         this.tipo = tipo;
     }
 
+    // Sobrecarga para compatibilidad con ORM (base de datos devuelve String)
+    public void setTipo(String tipo) {
+        this.tipo = Objects.valueOf(tipo);
+    }
+
     public int getPrecio() {
         return precio;
     }
 
-    public void setPrecio(int precio) {
+    public void setPrecio(Integer precio) {
         this.precio = precio;
     }
 

@@ -5,6 +5,7 @@ import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.orm.*;
 import edu.upc.dsa.orm.dao.UserDAOImpl;
+import edu.upc.dsa.orm.dao.GameObjectDAOImpl;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class GameManagerImpl implements GameManager {
     protected Map<String, GameObject> registred_objects;
     protected List<GameObject> objects;
     protected UserDAOImpl dao;
+    protected GameObjectDAOImpl objectDAO;
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
 
     private GameManagerImpl() {
@@ -28,6 +30,22 @@ public class GameManagerImpl implements GameManager {
         this.registred_objects = new HashMap<>();
         this.objects = new LinkedList<>();
         this.dao = new UserDAOImpl();
+        this.objectDAO = new GameObjectDAOImpl();
+
+        // Cargar objetos de la base de datos
+        loadObjectsFromDatabase();
+    }
+
+    private void loadObjectsFromDatabase() {
+        logger.info("Cargando objetos desde la base de datos...");
+        List<GameObject> dbObjects = objectDAO.getAllObjects();
+        if (dbObjects != null) {
+            for (GameObject obj : dbObjects) {
+                this.objects.add(obj);
+                this.registred_objects.put(obj.getNombre(), obj);
+            }
+            logger.info("Cargados " + dbObjects.size() + " objetos desde la BD");
+        }
     }
 
     public static GameManager getInstance() {
@@ -97,7 +115,7 @@ public class GameManagerImpl implements GameManager {
         User u = registred_users.get(username);
         if (u == null)
             return null;
-        //List<GameObject> list = u.getMyobjects();
+        // List<GameObject> list = u.getMyobjects();
         List<GameObject> list = dao.getObjectsbyUser(u);
         return list;
     }
@@ -115,9 +133,10 @@ public class GameManagerImpl implements GameManager {
 
             // temporal hasta nueva solucion
             u.setMyobjects(o);
-            dao.buyItem(u,o);
+            dao.buyItem(u, o);
         } else {
             u.setMyobjects(o);
+            dao.buyItem(u, o);
         }
         return u;
     }
