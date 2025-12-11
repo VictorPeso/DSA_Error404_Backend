@@ -1,31 +1,29 @@
 package edu.upc.dsa.orm.util;
 
-
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObjectHelper {
     final static Logger logger = Logger.getLogger(ObjectHelper.class);
 
     public static String[] getFields(Object entity) {
-
         Class theClass = entity.getClass();
-
         Field[] fields = theClass.getDeclaredFields();
 
-        String[] sFields = new String[fields.length];
-        int i=0;
+        List<String> fieldList = new ArrayList<>();
+        for (Field f : fields) {
+            if (!java.lang.reflect.Modifier.isTransient(f.getModifiers())) {
+                fieldList.add(f.getName());
+            }
+        }
 
-        for (Field f: fields) sFields[i++]=f.getName();
-
-        return sFields;
-
+        return fieldList.toArray(new String[0]);
     }
-
 
     public static void setter(Object instance, String propertyName, Object value) {
         String setterName = "NotCalledSetterMethod";
@@ -33,8 +31,8 @@ public class ObjectHelper {
             // Construimos el nombre del setter: set + Propiedad
             setterName = "set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
 
-            //Class<?> clazz = instance.getClass();
-            //Class<?> paramType = value.getClass();
+            // Class<?> clazz = instance.getClass();
+            // Class<?> paramType = value.getClass();
 
             // Obtenim la classe i el mètode getter
             Method setter = instance.getClass().getMethod(setterName, value.getClass());
@@ -42,25 +40,25 @@ public class ObjectHelper {
             // Invocamos el setter
             setter.invoke(instance, value);
 
-            //logger.info("UPDATED " + instance.getClass().getSimpleName() + " TO " + instance.toString());
+            // logger.info("UPDATED " + instance.getClass().getSimpleName() + " TO " +
+            // instance.toString());
 
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(
                     "No existe el setter '" + setterName + "' con parámetro de tipo "
-                            + value.getClass().getName(), e
-            );
+                            + value.getClass().getName(),
+                    e);
 
         } catch (IllegalAccessException e) {
             throw new RuntimeException(
-                    "No tienes acceso para invocar el setter '" + setterName + "'", e
-            );
+                    "No tienes acceso para invocar el setter '" + setterName + "'", e);
 
         } catch (InvocationTargetException e) {
             Throwable causa = e.getCause();
             throw new RuntimeException(
                     "El setter '" + setterName + "' lanzó una excepción interna: "
-                            + causa.getMessage(), causa
-            );
+                            + causa.getMessage(),
+                    causa);
         }
     }
 
@@ -73,25 +71,24 @@ public class ObjectHelper {
             Method getter = instance.getClass().getMethod(getterName);
 
             // Invoquem el getter sense paràmetres
-            //logger.info("CONSULTED " + instance.getClass().getSimpleName() + " WITH " + instance.toString());
+            // logger.info("CONSULTED " + instance.getClass().getSimpleName() + " WITH " +
+            // instance.toString());
             return getter.invoke(instance);
 
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(
-                    "No existe el getter '" + getterName + "'", e
-            );
+                    "No existe el getter '" + getterName + "'", e);
 
         } catch (IllegalAccessException e) {
             throw new RuntimeException(
-                    "No tienes acceso para invocar el getter '" + getterName + "'", e
-            );
+                    "No tienes acceso para invocar el getter '" + getterName + "'", e);
 
         } catch (InvocationTargetException e) {
             Throwable causa = e.getCause();
             throw new RuntimeException(
                     "El getter '" + getterName + "' lanzó una excepción interna: "
-                            + causa.getMessage(), causa
-            );
+                            + causa.getMessage(),
+                    causa);
         }
     }
 }

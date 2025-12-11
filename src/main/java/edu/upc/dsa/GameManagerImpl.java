@@ -41,15 +41,18 @@ public class GameManagerImpl implements GameManager {
         username = username.toLowerCase();
         logger.info("Iniciando sesión " + username);
 
-        //UserDAOImpl dao = new UserDAOImpl();
+        // UserDAOImpl dao = new UserDAOImpl();
         User u = dao.getUser(username);
 
-        //User u = registred_users.get(username);
+        // User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
             logger.error("Usuario o contraseña incorrectas");
             throw new Exception("Usuario o contraseña incorrectas");
         }
-        logger.info("Sesión iniciada");
+
+        this.registred_users.put(username, u);
+
+        logger.info("Sesión iniciada correctamente para " + username);
         return u;
     }
 
@@ -71,7 +74,7 @@ public class GameManagerImpl implements GameManager {
         User u = new User(username, password, email);
         this.registred_users.put(username, u);
 
-        //serDAOImpl dao = new UserDAOImpl();
+        // serDAOImpl dao = new UserDAOImpl();
         dao.addUser(u);
 
         logger.info("Registrado correctamente");

@@ -8,13 +8,14 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private int ActFrag;
-    private int BestScore;
-    private List<GameObject> myobjects;
-    private int vidaInicial;
-    private int monedas;
+    private Integer ActFrag;
+    private Integer BestScore;
+    private transient List<GameObject> myobjects;
+    private Integer vidaInicial;
+    private Integer monedas;
 
     public User() {
+        this.myobjects = new ArrayList<>();
     }
 
     public User(String username, String password, String email) {
@@ -56,7 +57,7 @@ public class User {
         return ActFrag;
     }
 
-    public void setActFrag(int actFrag) {
+    public void setActFrag(Integer actFrag) {
         ActFrag = actFrag;
     }
 
@@ -64,7 +65,7 @@ public class User {
         return BestScore;
     }
 
-    public void setBestScore(int bestScore) {
+    public void setBestScore(Integer bestScore) {
         BestScore = bestScore;
     }
 
@@ -80,7 +81,7 @@ public class User {
         return vidaInicial;
     }
 
-    public void setVidaInicial(int vidaInicial) {
+    public void setVidaInicial(Integer vidaInicial) {
         this.vidaInicial = vidaInicial;
     }
 
@@ -88,7 +89,7 @@ public class User {
         return monedas;
     }
 
-    public void setMonedas(int monedas) {
+    public void setMonedas(Integer monedas) {
         this.monedas = monedas;
     }
 
