@@ -96,6 +96,9 @@ public class GameManagerImpl implements GameManager {
 
         if (u.CheckObject(o)) {
             logger.info("El usuario ya tiene el objeto");
+
+            // temporal hasta nueva solucion
+            u.setMyobjects(o);
         } else {
             u.setMyobjects(o);
         }

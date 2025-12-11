@@ -9,10 +9,11 @@ public class GameObject {
     private Objects tipo;
     private int precio;
 
-    public GameObject() {}
+    public GameObject() {
+    }
 
-    public GameObject(String nombre, String descripcion, Objects tipo,  int precio) {
-        this.id = UUID.randomUUID().toString();
+    public GameObject(String nombre, String descripcion, Objects tipo, int precio) {
+        this.id = UUID.randomUUID().toString().substring(0, 5);
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.tipo = tipo;
