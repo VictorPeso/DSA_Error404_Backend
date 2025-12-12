@@ -27,13 +27,13 @@ CREATE TABLE IF NOT EXISTS User_GameObject (
     FOREIGN KEY (id) REFERENCES GameObject(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE INDEX idx_user_email ON User(email);
-CREATE INDEX idx_gameobject_tipo ON GameObject(tipo);
+--CREATE INDEX idx_user_email ON User(email);
+--CREATE INDEX idx_gameobject_tipo ON GameObject(tipo);
 
-INSERT INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
+INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
 ('obj01', 'Espada de Fuego', 'Una espada legendaria que causa daño de fuego', 'ESPADA', 150),
 ('obj02', 'Escudo Mágico', 'Escudo que absorbe daño mágico', 'ESCUDO', 120),
-('obj03', 'Poción de Vida', 'Restaura 50 puntos de vida', 'POCION', 30),
+('obj03', 'Poción de Vida', 'Restaura 50 puntos de vida', 'POCION', 30);
 
-INSERT INTO User (username, password, email, ActFrag, BestScore, vidaInicial, monedas) VALUES
+INSERT IGNORE INTO User (username, password, email, ActFrag, BestScore, vidaInicial, monedas) VALUES
 ('testuser', 'test123', 'test@example.com', 0, 0, 100, 500);
