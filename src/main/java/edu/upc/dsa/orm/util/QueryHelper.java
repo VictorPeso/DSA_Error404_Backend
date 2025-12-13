@@ -177,7 +177,7 @@ public class QueryHelper {
     }
 
     public static String createQueryEXISTS_M2N(String relationTable, String field1, String field2) {
-        // SELECT COUNT(*) FROM user_gameobject WHERE username = ? AND id = ?
+        // SELECT COUNT(*) FROM User_GameObject WHERE username = ? AND id = ?
         StringBuffer sb = new StringBuffer("SELECT COUNT(*) FROM ");
         sb.append(relationTable);
         sb.append(" WHERE ");
@@ -187,7 +187,7 @@ public class QueryHelper {
     }
 
     public static String createQueryUPDATE_QUANTITY_M2N(String relationTable, String field1, String field2) {
-        // UPDATE user_gameobject SET cantidad = cantidad + 1 WHERE username = ? AND id
+        // UPDATE User_GameObject SET cantidad = cantidad + 1 WHERE username = ? AND id
         // = ?
         StringBuffer sb = new StringBuffer("UPDATE ");
         sb.append(relationTable);

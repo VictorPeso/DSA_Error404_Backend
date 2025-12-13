@@ -87,10 +87,10 @@ public class UserDAOImpl implements UserDAO {
             session = FactorySession.openSession();
             conn = session.getConnection();
 
-            String query = "SELECT GameObject.*, user_gameobject.cantidad " +
-                    "FROM GameObject, user_gameobject " +
-                    "WHERE user_gameobject.username = ? " +
-                    "AND GameObject.id = user_gameobject.id";
+            String query = "SELECT GameObject.*, User_GameObject.cantidad " +
+                    "FROM GameObject, User_GameObject " +
+                    "WHERE User_GameObject.username = ? " +
+                    "AND GameObject.id = User_GameObject.id";
 
             PreparedStatement pstm = conn.prepareStatement(query);
             pstm.setString(1, user.getUsername());
@@ -132,7 +132,7 @@ public class UserDAOImpl implements UserDAO {
                 logger.info("Cantidad incrementada para objeto " + obj.getId());
             } else {
                 // Insertar nuevo
-                session.save_M2N(user, obj, "user_gameobject");
+                session.save_M2N(user, obj, "User_GameObject");
                 logger.info("Objeto " + obj.getId() + " comprado por primera vez");
             }
 
@@ -149,7 +149,7 @@ public class UserDAOImpl implements UserDAO {
 
     private boolean userHasObject(Session session, String username, String objectId) {
         try {
-            return session.exists_M2N("user_gameobject", "username", username, "id", objectId);
+            return session.exists_M2N("User_GameObject", "username", username, "id", objectId);
         } catch (Exception e) {
             logger.error("Error al verificar objeto", e);
         }
@@ -158,7 +158,7 @@ public class UserDAOImpl implements UserDAO {
 
     private void incrementObjectQuantity(Session session, String username, String objectId) {
         try {
-            session.updateQuantity_M2N("user_gameobject", "username", username, "id", objectId);
+            session.updateQuantity_M2N("User_GameObject", "username", username, "id", objectId);
         } catch (Exception e) {
             logger.error("Error al incrementar cantidad", e);
             throw new RuntimeException("Error al incrementar cantidad", e);
