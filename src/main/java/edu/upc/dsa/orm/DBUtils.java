@@ -8,7 +8,7 @@ public class DBUtils {
 
     public static final String DB_NAME = "error404db";
     public static final String DB_HOST = "127.0.0.1";
-    public static final String DB_USER = "root";
+    public static final String DB_USER = "dsa";
     public static final String DB_PASS = "1234";
     public static final String DB_PORT = "3306";
 
@@ -16,7 +16,7 @@ public class DBUtils {
         return DB_NAME;
     }
 
-    public static String getDbHost(){
+    public static String getDbHost() {
         return DB_HOST;
     }
 
@@ -28,7 +28,7 @@ public class DBUtils {
         return DB_PASS;
     }
 
-    public static  String getDbPort() {
+    public static String getDbPort() {
         return DB_PORT;
     }
 
@@ -39,9 +39,8 @@ public class DBUtils {
         String user = DBUtils.getDbUser();
         String pass = DBUtils.getDbPasswd();
 
-
-        Connection connection = DriverManager.getConnection("jdbc:mariadb://"+host+":"+port+"/"+
-                db+"?user="+user+"&password="+pass);
+        Connection connection = DriverManager.getConnection("jdbc:mariadb://" + host + ":" + port + "/" +
+                db + "?user=" + user + "&password=" + pass);
 
         return connection;
     }
