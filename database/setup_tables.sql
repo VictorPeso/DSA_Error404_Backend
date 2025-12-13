@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS GameObject (
 CREATE TABLE IF NOT EXISTS User_GameObject (
     username VARCHAR(50) NOT NULL,
     id VARCHAR(10) NOT NULL,
-    cantidad INT NOT NULL,
+    cantidad INT NOT NULL DEFAULT 1,
     PRIMARY KEY (username, id),
     FOREIGN KEY (username) REFERENCES User(username) ON DELETE CASCADE,
     FOREIGN KEY (id) REFERENCES GameObject(id) ON DELETE CASCADE

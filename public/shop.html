@@ -130,16 +130,7 @@
                     if (items.length === 0) {
                         listElement.append('<li class="list-group-item list-group-item-dark text-muted">Inventario vacío</li>');
                     } else {
-                        const grouped = {};
                         items.forEach(item => {
-                            const key = item.id || item.nombre;
-                            if (!grouped[key]) {
-                                grouped[key] = { ...item, cantidad: 0 };
-                            }
-                            grouped[key].cantidad++;
-                        });
-
-                        Object.values(grouped).forEach(item => {
                             const iconClass = getIconForType(item.tipo);
                             listElement.append(`
                                 <li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center">
@@ -150,7 +141,7 @@
                         });
                     }
                 });
-        }
+            }
 
         function loadUserData(username) {
             fetch(API_URL + "/game/users/" + username)

@@ -49,6 +49,10 @@ public class SessionImpl implements Session {
         }
     }
 
+    public Connection getConnection() {
+        return this.conn;
+    }
+
     public Object get(Class theClass, Object ID) {
         String selectQuery = QueryHelper.createQuerySELECT(theClass);
         // SELECT * FROM Users WHERE username = ?
@@ -102,14 +106,9 @@ public class SessionImpl implements Session {
                 }
             }
 
-            Object condition = fields[0];
-            pstm.setObject(i, condition);
-            //
-            // // Finalmente el ID para el WHERE
-            // Object idValue = ObjectHelper.getIdValue(object); // Asumiendo que tienes
-            // este helper
-            // pstm.setObject(i, idValue);
-            //
+            // Finalmente el valor del ID para el WHERE
+            pstm.setObject(i, ObjectHelper.getter(object, fields[0]));
+
             pstm.executeUpdate();
 
         } catch (SQLException e) {
@@ -246,6 +245,35 @@ public class SessionImpl implements Session {
             e.printStackTrace();
         }
 
+    }
+
+    public boolean exists_M2N(String relationTable, String field1, Object value1, String field2, Object value2) {
+        try {
+            String query = QueryHelper.createQueryEXISTS_M2N(relationTable, field1, field2);
+            PreparedStatement pstm = conn.prepareStatement(query);
+            pstm.setObject(1, value1);
+            pstm.setObject(2, value2);
+            ResultSet rs = pstm.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateQuantity_M2N(String relationTable, String field1, Object value1, String field2, Object value2) {
+        try {
+            String query = QueryHelper.createQueryUPDATE_QUANTITY_M2N(relationTable, field1, field2);
+            PreparedStatement pstm = conn.prepareStatement(query);
+            pstm.setObject(1, value1);
+            pstm.setObject(2, value2);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

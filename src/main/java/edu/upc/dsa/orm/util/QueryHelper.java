@@ -175,4 +175,26 @@ public class QueryHelper {
         }
         return sb.toString();
     }
+
+    public static String createQueryEXISTS_M2N(String relationTable, String field1, String field2) {
+        // SELECT COUNT(*) FROM user_gameobject WHERE username = ? AND id = ?
+        StringBuffer sb = new StringBuffer("SELECT COUNT(*) FROM ");
+        sb.append(relationTable);
+        sb.append(" WHERE ");
+        sb.append(field1).append(" = ? AND ");
+        sb.append(field2).append(" = ?");
+        return sb.toString();
+    }
+
+    public static String createQueryUPDATE_QUANTITY_M2N(String relationTable, String field1, String field2) {
+        // UPDATE user_gameobject SET cantidad = cantidad + 1 WHERE username = ? AND id
+        // = ?
+        StringBuffer sb = new StringBuffer("UPDATE ");
+        sb.append(relationTable);
+        sb.append(" SET cantidad = cantidad + 1 WHERE ");
+        sb.append(field1).append(" = ? AND ");
+        sb.append(field2).append(" = ?");
+        return sb.toString();
+    }
+
 }

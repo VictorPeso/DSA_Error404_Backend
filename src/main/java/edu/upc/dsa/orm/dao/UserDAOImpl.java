@@ -1,11 +1,16 @@
 package edu.upc.dsa.orm.dao;
 
-import edu.upc.dsa.GameManagerImpl;
+import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.GameObject;
+import edu.upc.dsa.models.UserGameObject;
 import edu.upc.dsa.orm.FactorySession;
 import edu.upc.dsa.orm.Session;
-import edu.upc.dsa.models.*;
 import org.apache.log4j.Logger;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -74,17 +79,37 @@ public class UserDAOImpl implements UserDAO {
 
     }
 
-    public List<GameObject> getObjectsbyUser(User user) {
+    public List<UserGameObject> getObjectsbyUser(User user) {
         Session session = null;
-        List<GameObject> objectList = null;
+        List<UserGameObject> objectList = new ArrayList<>();
+        Connection conn = null;
         try {
             session = FactorySession.openSession();
-            HashMap<String, String> hs = new HashMap<>();
-            hs.put("User.username", user.getUsername());
-            @SuppressWarnings("unchecked")
-            List<GameObject> result = (List<GameObject>) (List<?>) session.findAll_M2N(User.class, GameObject.class,
-                    "user_gameobject", hs);
-            objectList = result;
+            conn = session.getConnection();
+
+            String query = "SELECT GameObject.*, user_gameobject.cantidad " +
+                    "FROM GameObject, user_gameobject " +
+                    "WHERE user_gameobject.username = ? " +
+                    "AND GameObject.id = user_gameobject.id";
+
+            PreparedStatement pstm = conn.prepareStatement(query);
+            pstm.setString(1, user.getUsername());
+            ResultSet rs = pstm.executeQuery();
+
+            while (rs.next()) {
+                GameObject obj = new GameObject();
+                obj.setId(rs.getString("id"));
+                obj.setNombre(rs.getString("nombre"));
+                obj.setDescripcion(rs.getString("descripcion"));
+                obj.setTipo(rs.getString("tipo"));
+                obj.setPrecio(rs.getInt("precio"));
+
+                Integer cantidad = rs.getInt("cantidad");
+
+                UserGameObject ugo = new UserGameObject(obj, cantidad);
+                objectList.add(ugo);
+            }
+
         } catch (Exception e) {
             logger.error("Error al obtener objetos del usuario " + user.getUsername(), e);
         } finally {
@@ -99,17 +124,45 @@ public class UserDAOImpl implements UserDAO {
         Session session = null;
         try {
             session = FactorySession.openSession();
-            session.save_M2N(user, obj, "user_gameobject");
-            logger.info("Usuario " + user.getUsername() + " registrado correctamente");
+
+            // Verificar si el usuario ya tiene el objeto
+            if (userHasObject(session, user.getUsername(), obj.getId())) {
+                // Incrementar cantidad
+                incrementObjectQuantity(session, user.getUsername(), obj.getId());
+                logger.info("Cantidad incrementada para objeto " + obj.getId());
+            } else {
+                // Insertar nuevo
+                session.save_M2N(user, obj, "user_gameobject");
+                logger.info("Objeto " + obj.getId() + " comprado por primera vez");
+            }
+
         } catch (Exception e) {
-            logger.error("No se ha podido registrar el usuario " + user.getUsername(), e);
-            throw new RuntimeException("Error al registrar usuario", e);
+            logger.error("Error al comprar objeto " + obj.getId(), e);
+            throw new RuntimeException("Error al comprar objeto", e);
         } finally {
             if (session != null) {
                 session.close();
             }
         }
         return user.getUsername();
+    }
+
+    private boolean userHasObject(Session session, String username, String objectId) {
+        try {
+            return session.exists_M2N("user_gameobject", "username", username, "id", objectId);
+        } catch (Exception e) {
+            logger.error("Error al verificar objeto", e);
+        }
+        return false;
+    }
+
+    private void incrementObjectQuantity(Session session, String username, String objectId) {
+        try {
+            session.updateQuantity_M2N("user_gameobject", "username", username, "id", objectId);
+        } catch (Exception e) {
+            logger.error("Error al incrementar cantidad", e);
+            throw new RuntimeException("Error al incrementar cantidad", e);
+        }
     }
 
     //

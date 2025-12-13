@@ -3,6 +3,7 @@ package edu.upc.dsa;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.UserGameObject;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface GameManager {
     public User purchaseObject(String username, String objectId) throws Exception;
 
     // Objetos
-    public List<GameObject> getListObjects(String username);
+    public List<UserGameObject> getListObjects(String username);
 
     public User addObjectToUser(String username, String objectId);
 

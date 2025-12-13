@@ -4,12 +4,14 @@ import edu.upc.dsa.GameManager;
 import edu.upc.dsa.GameManagerImpl;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.UserGameObject;
 
 import edu.upc.dsa.models.dto.Credentials;
 import edu.upc.dsa.models.dto.AddObject;
 
 import edu.upc.dsa.models.dto.RegisterCredentials;
 import edu.upc.dsa.models.dto.UserDTO;
+import edu.upc.dsa.models.dto.GameObjectDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -19,6 +21,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 
 import static edu.upc.dsa.models.Objects.*;
@@ -130,20 +133,34 @@ public class GameService {
     @GET
     @ApiOperation(value = "Obtener lista de objetos de un usuario")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful", response = GameObject.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Successful", response = GameObjectDTO.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
     @Path("/users/objects/list")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserObjects(@QueryParam("nombre") String nombre) {
 
-        List<GameObject> objects = this.gm.getListObjects(nombre);
+        List<UserGameObject> userObjects = this.gm.getListObjects(nombre);
 
-        if (objects == null) {
+        if (userObjects == null) {
             return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
         }
 
-        GenericEntity<List<GameObject>> entity = new GenericEntity<List<GameObject>>(objects) {
+        List<GameObjectDTO> flattenedObjects = new ArrayList<>();
+        for (UserGameObject ugo : userObjects) {
+            GameObject obj = ugo.getGameObject();
+            GameObjectDTO dto = new GameObjectDTO(
+                    obj.getId(),
+                    obj.getNombre(),
+                    obj.getDescripcion(),
+                    obj.getTipo(),
+                    obj.getPrecio(),
+                    ugo.getCantidad());
+            flattenedObjects.add(dto);
+        }
+
+        GenericEntity<List<GameObjectDTO>> entity = new GenericEntity<List<GameObjectDTO>>(
+                flattenedObjects) {
         };
         return Response.status(Response.Status.OK).entity(entity).build();
     }

@@ -3,6 +3,7 @@ package edu.upc.dsa;
 import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.GameObject;
+import edu.upc.dsa.models.UserGameObject;
 import edu.upc.dsa.orm.*;
 import edu.upc.dsa.orm.dao.UserDAOImpl;
 import edu.upc.dsa.orm.dao.GameObjectDAOImpl;
@@ -110,13 +111,13 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public List<GameObject> getListObjects(String username) {
+    public List<UserGameObject> getListObjects(String username) {
         logger.info("Obtener todos los objetos del usuario  " + username);
         User u = registred_users.get(username);
         if (u == null)
             return null;
         // List<GameObject> list = u.getMyobjects();
-        List<GameObject> list = dao.getObjectsbyUser(u);
+        List<UserGameObject> list = dao.getObjectsbyUser(u);
         return list;
     }
 
@@ -166,6 +167,8 @@ public class GameManagerImpl implements GameManager {
 
         int nuevoSaldo = u.getMonedas() - o.getPrecio();
         u.setMonedas(nuevoSaldo);
+
+        dao.updateUser(u);
 
         logger.info("Compra realizada. Nuevo saldo: " + nuevoSaldo);
         return this.addObjectToUser(username, objectId);
