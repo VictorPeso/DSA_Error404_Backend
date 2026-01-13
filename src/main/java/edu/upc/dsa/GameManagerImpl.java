@@ -4,9 +4,9 @@ import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.models.UserGameObject;
-import edu.upc.dsa.orm.*;
 import edu.upc.dsa.orm.dao.UserDAOImpl;
 import edu.upc.dsa.orm.dao.GameObjectDAOImpl;
+import edu.upc.dsa.orm.Session;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -16,9 +16,7 @@ import java.util.Map;
 
 public class GameManagerImpl implements GameManager {
     private static GameManager instance;
-    // protected List<User> registred_users;
-    // key: username
-    protected Map<String, User> registred_users;
+    
     // key: object name
     protected Map<String, GameObject> registred_objects;
     protected List<GameObject> objects;
@@ -27,7 +25,6 @@ public class GameManagerImpl implements GameManager {
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
 
     private GameManagerImpl() {
-        this.registred_users = new HashMap<>();
         this.registred_objects = new HashMap<>();
         this.objects = new LinkedList<>();
         this.dao = new UserDAOImpl();
@@ -60,16 +57,12 @@ public class GameManagerImpl implements GameManager {
         username = username.toLowerCase();
         logger.info("Iniciando sesión " + username);
 
-        // UserDAOImpl dao = new UserDAOImpl();
         User u = dao.getUser(username);
 
-        // User u = registred_users.get(username);
         if (u == null || !u.getPassword().equals(password)) {
             logger.error("Usuario o contraseña incorrectas");
             throw new Exception("Usuario o contraseña incorrectas");
         }
-
-        this.registred_users.put(username, u);
 
         logger.info("Sesión iniciada correctamente para " + username);
         return u;
@@ -78,22 +71,14 @@ public class GameManagerImpl implements GameManager {
     public User Register(String username, String password, String email) throws Exception {
         username = username.toLowerCase();
         email = email.toLowerCase();
-        logger.info("registrar el usuario " + username + " " + email);
-        if (registred_users.containsKey(username)) {
-            logger.error("el usuario " + username + " ya existe");
+        logger.info("Intentando registrar usuario: " + username);
+        
+        User existingUser = dao.getUser(username);
+        if (existingUser != null) {
+            logger.error("Error al registrar: el usuario '" + username + "' ya existe en la base de datos.");
             throw new Exception("El usuario ya existe");
         }
-        for (User existingUser : registred_users.values()) {
-            if (existingUser.getEmail().equalsIgnoreCase(email)) {
-                logger.error("el correo " + email + " ya esta registrado");
-                throw new Exception("El correo ya está registrado");
-            }
-        }
-
         User u = new User(username, password, email);
-        this.registred_users.put(username, u);
-
-        // serDAOImpl dao = new UserDAOImpl();
         dao.addUser(u);
 
         logger.info("Registrado correctamente");
@@ -104,6 +89,14 @@ public class GameManagerImpl implements GameManager {
     public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, int precio) {
         logger.info("Nuevo objeto " + nombre + " " + descripcion + "creado");
         GameObject o = new GameObject(nombre, descripcion, tipo, precio);
+        
+        // Guardar en la base de datos
+        try {
+            objectDAO.addObject(o);
+        } catch (Exception e) {
+            logger.error("No se ha podido guardar el objeto en la BD", e);
+        }
+        
         this.objects.add(o);
         this.registred_objects.put(nombre, o);
         logger.info("Nuevo objeto " + nombre + " " + descripcion + " " + o.getId() + " " + "creado correctamente");
@@ -113,51 +106,40 @@ public class GameManagerImpl implements GameManager {
     @Override
     public List<UserGameObject> getListObjects(String username) {
         logger.info("Obtener todos los objetos del usuario  " + username);
-        User u = registred_users.get(username);
+        User u = dao.getUser(username);
         if (u == null)
             return null;
-        // List<GameObject> list = u.getMyobjects();
+        
         List<UserGameObject> list = dao.getObjectsbyUser(u);
         return list;
     }
 
     @Override
     public User addObjectToUser(String username, String objectId) {
-        User u = this.registred_users.get(username);
+        User u = dao.getUser(username);
         GameObject o = this.getStoreObject(objectId);
 
         if (u == null || o == null)
             return null;
 
-        if (u.CheckObject(o)) {
-            logger.info("El usuario ya tiene el objeto");
-
-            // temporal hasta nueva solucion
-            u.setMyobjects(o);
-            dao.buyItem(u, o);
-        } else {
-            u.setMyobjects(o);
-            dao.buyItem(u, o);
-        }
+        dao.buyItem(u, o);
+        
         return u;
     }
 
     public User purchaseObject(String username, String objectId) throws Exception {
         logger.info("Añadiendo objeto " + objectId + " al usuario " + username);
 
-        User u = this.registred_users.get(username);
-
+        User u = dao.getUser(username);
         GameObject o = this.getStoreObject(objectId);
 
         if (u == null) {
             logger.error("Usuario no encontrado: " + username);
-
             return null;
         }
 
         if (o == null) {
             logger.error("Objeto no encontrado en la tienda: " + objectId);
-
             return null;
         }
 
@@ -183,14 +165,49 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public User getUser(String username) {
-        User u = this.registred_users.get(username);
-        return u;
+        return dao.getUser(username);
     }
 
-    // ------------------------------------------------
+    @Override
     public int getNumberOfUsersRegistered() {
-        int i = registred_users.size();
-        return i;
+        Session session = null;
+        try {
+            session = edu.upc.dsa.orm.FactorySession.openSession();
+            List<Object> users = session.findAll(User.class, new HashMap<>());
+            return users != null ? users.size() : 0;
+        } catch (Exception e) {
+            logger.error("Error al contar usuarios", e);
+            return 0;
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+    
+    @Override
+    public void clear() {
+        try (java.sql.Connection conn = edu.upc.dsa.orm.DBUtils.getConnection()) {
+            java.sql.DatabaseMetaData meta = conn.getMetaData();
+            logger.info("Limpiando DB: " + meta.getURL() + " con usuario " + meta.getUserName());
+            
+            // solo en testeo - ESTO BORRA TODA LA BASE DE DATOS
+            /*
+            try (java.sql.Statement st = conn.createStatement()) {
+                st.executeUpdate("SET FOREIGN_KEY_CHECKS = 0;");
+                int rowsUG = st.executeUpdate("DELETE FROM User_GameObject;");
+                int rowsU = st.executeUpdate("DELETE FROM User;");
+                int rowsG = st.executeUpdate("DELETE FROM GameObject;");
+                st.executeUpdate("SET FOREIGN_KEY_CHECKS = 1;");
+                
+                logger.info("Tablas limpiadas. Filas borradas: User_GameObject=" + rowsUG + ", User=" + rowsU + ", GameObject=" + rowsG);
+            }
+            */
+            
+            this.registred_objects.clear();
+            this.objects.clear();
+            logger.info("Estado interno de GameManager limpiado");
+        } catch (Exception e) {
+            logger.error("Error al limpiar GameManager", e);
+        }
     }
 
     public GameObject getStoreObject(String id) {

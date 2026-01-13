@@ -70,10 +70,11 @@ public class ObjectHelper {
             // Obtenim la classe i el mètode getter
             Method getter = instance.getClass().getMethod(getterName);
 
-            // Invoquem el getter sense paràmetres
-            // logger.info("CONSULTED " + instance.getClass().getSimpleName() + " WITH " +
-            // instance.toString());
-            return getter.invoke(instance);
+            Object value = getter.invoke(instance);
+            if (value != null && value.getClass().isEnum()) {
+                return value.toString();
+            }
+            return value;
 
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(

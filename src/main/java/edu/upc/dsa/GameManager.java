@@ -30,4 +30,6 @@ public interface GameManager {
     public int getNumberOfUsersRegistered();
 
     public User getUser(String username);
+
+    public void clear();
 }

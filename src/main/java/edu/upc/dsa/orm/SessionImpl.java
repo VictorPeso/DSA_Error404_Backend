@@ -18,25 +18,16 @@ public class SessionImpl implements Session {
 
     public void save(Object entity) {
         String insertQuery = QueryHelper.createQueryINSERT(entity);
-        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?,
-        // ?,?)
-
-        PreparedStatement pstm = null;
-
-        try {
-            pstm = conn.prepareStatement(insertQuery);
-            // pstm.setObject(1, 0);
+        
+        try (PreparedStatement pstm = conn.prepareStatement(insertQuery)) {
             int i = 1;
             for (String field : ObjectHelper.getFields(entity)) {
                 pstm.setObject(i++, ObjectHelper.getter(entity, field));
             }
-
             pstm.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public void close() {
@@ -55,26 +46,21 @@ public class SessionImpl implements Session {
 
     public Object get(Class theClass, Object ID) {
         String selectQuery = QueryHelper.createQuerySELECT(theClass);
-        // SELECT * FROM Users WHERE username = ?
-        PreparedStatement pstm = null;
         Object o = null;
 
-        try {
-            o = theClass.newInstance();
-            pstm = conn.prepareStatement(selectQuery);
-
+        try (PreparedStatement pstm = conn.prepareStatement(selectQuery)) {
             pstm.setObject(1, ID);
 
-            ResultSet res = pstm.executeQuery();
-
-            ResultSetMetaData rsmd = res.getMetaData();
-            int numColumns = rsmd.getColumnCount();
-
-            if (res.next()) {
-                for (int i = 1; i <= numColumns; i++) { // Columnas empiezan en 1
-                    String key = rsmd.getColumnName(i);
-                    Object value = res.getObject(i);
-                    ObjectHelper.setter(o, key, value);
+            try (ResultSet res = pstm.executeQuery()) {
+                if (res.next()) {
+                    o = theClass.newInstance();
+                    ResultSetMetaData rsmd = res.getMetaData();
+                    int numColumns = rsmd.getColumnCount();
+                    for (int i = 1; i <= numColumns; i++) { 
+                        String key = rsmd.getColumnName(i);
+                        Object value = res.getObject(i);
+                        ObjectHelper.setter(o, key, value);
+                    }
                 }
             }
 
@@ -90,12 +76,7 @@ public class SessionImpl implements Session {
     public void update(Object object) {
         String updateQuery = QueryHelper.createQueryUPDATE(object);
 
-        PreparedStatement pstm = null;
-
-        try {
-            pstm = conn.prepareStatement(updateQuery);
-            // UPDATE User SET lastName = ?, firstName = ?, address = ?, city = ? WHERE id =
-            // ?
+        try (PreparedStatement pstm = conn.prepareStatement(updateQuery)) {
             String[] fields = ObjectHelper.getFields(object);
             int i = 1;
 
@@ -118,13 +99,8 @@ public class SessionImpl implements Session {
 
     public void delete(Object object) {
         String deleteQuery = QueryHelper.createQueryDELETE(object);
-        // DELETE FROM Users WHERE username = ?;
 
-        PreparedStatement pstm = null;
-
-        try {
-            pstm = conn.prepareStatement(deleteQuery);
-
+        try (PreparedStatement pstm = conn.prepareStatement(deleteQuery)) {
             String idValue = ObjectHelper.getFields(object)[0];
             pstm.setObject(1, ObjectHelper.getter(object, idValue));
 
@@ -137,13 +113,9 @@ public class SessionImpl implements Session {
 
     public List<Object> findAll(Class theClass, HashMap params) {
         String selectQuery = QueryHelper.createqueryFINDALL(theClass, params);
-
-        PreparedStatement pstm = null;
         List<Object> resultList = new ArrayList<>();
 
-        try {
-            pstm = conn.prepareStatement(selectQuery);
-
+        try (PreparedStatement pstm = conn.prepareStatement(selectQuery)) {
             int index = 1;
 
             for (Object key : params.keySet()) {
@@ -151,20 +123,19 @@ public class SessionImpl implements Session {
                 index++;
             }
 
-            ResultSet res = pstm.executeQuery();
-            ResultSetMetaData rsmd = res.getMetaData();
-            int numColumns = rsmd.getColumnCount();
+            try (ResultSet res = pstm.executeQuery()) {
+                ResultSetMetaData rsmd = res.getMetaData();
+                int numColumns = rsmd.getColumnCount();
 
-            while (res.next()) {
-                Object o = theClass.newInstance();
-
-                for (int i = 1; i <= numColumns; i++) {
-                    String colName = rsmd.getColumnName(i);
-                    Object value = res.getObject(i);
-                    ObjectHelper.setter(o, colName, value);
+                while (res.next()) {
+                    Object o = theClass.newInstance();
+                    for (int i = 1; i <= numColumns; i++) {
+                        String colName = rsmd.getColumnName(i);
+                        Object value = res.getObject(i);
+                        ObjectHelper.setter(o, colName, value);
+                    }
+                    resultList.add(o);
                 }
-
-                resultList.add(o);
             }
 
         } catch (SQLException e) {
@@ -178,13 +149,9 @@ public class SessionImpl implements Session {
 
     public List<Object> findAll_M2N(Class theClass, Class theClass2, String inter, HashMap params) {
         String selectQuery = QueryHelper.createqueryFINDALL_M2N(theClass, theClass2, inter, params);
-
-        PreparedStatement pstm = null;
         List<Object> resultList = new ArrayList<>();
 
-        try {
-            pstm = conn.prepareStatement(selectQuery);
-
+        try (PreparedStatement pstm = conn.prepareStatement(selectQuery)) {
             int index = 1;
 
             for (Object key : params.keySet()) {
@@ -192,21 +159,19 @@ public class SessionImpl implements Session {
                 index++;
             }
 
-            ResultSet res = pstm.executeQuery();
-            ResultSetMetaData rsmd = res.getMetaData();
-            int numColumns = rsmd.getColumnCount();
+            try (ResultSet res = pstm.executeQuery()) {
+                ResultSetMetaData rsmd = res.getMetaData();
+                int numColumns = rsmd.getColumnCount();
 
-            while (res.next()) {
-                // Crear instancia de theClass2 porque la query hace SELECT theClass2.*
-                Object o = theClass2.newInstance();
-
-                for (int i = 1; i <= numColumns; i++) {
-                    String colName = rsmd.getColumnName(i);
-                    Object value = res.getObject(i);
-                    ObjectHelper.setter(o, colName, value);
+                while (res.next()) {
+                    Object o = theClass2.newInstance();
+                    for (int i = 1; i <= numColumns; i++) {
+                        String colName = rsmd.getColumnName(i);
+                        Object value = res.getObject(i);
+                        ObjectHelper.setter(o, colName, value);
+                    }
+                    resultList.add(o);
                 }
-
-                resultList.add(o);
             }
 
         } catch (SQLException e) {
@@ -220,43 +185,32 @@ public class SessionImpl implements Session {
 
     public void save_M2N(Object entity, Object entity2, String relationTable) {
         String insertQuery = QueryHelper.createQueryINSERT_M2N(entity, entity2, relationTable);
-        // INSERT INTO User (ID, lastName, firstName, address, city) VALUES (0, ?, ?,
-        // ?,?)
 
-        PreparedStatement pstm = null;
-
-        try {
-            pstm = conn.prepareStatement(insertQuery);
-
+        try (PreparedStatement pstm = conn.prepareStatement(insertQuery)) {
             String[] fields1 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity);
             String[] fields2 = edu.upc.dsa.orm.util.ObjectHelper.getFields(entity2);
 
             pstm.setObject(1, ObjectHelper.getter(entity, fields1[0]));
             pstm.setObject(2, ObjectHelper.getter(entity2, fields2[0]));
 
-            // int i = 1;
-            // for (String field: ObjectHelper.getFields(entity)) {
-            // pstm.setObject(i++, ObjectHelper.getter(entity, field));
-            // }
-
             pstm.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     public boolean exists_M2N(String relationTable, String field1, Object value1, String field2, Object value2) {
-        try {
-            String query = QueryHelper.createQueryEXISTS_M2N(relationTable, field1, field2);
-            PreparedStatement pstm = conn.prepareStatement(query);
+        String query = QueryHelper.createQueryEXISTS_M2N(relationTable, field1, field2);
+        
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setObject(1, value1);
             pstm.setObject(2, value2);
-            ResultSet rs = pstm.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
+            
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -265,9 +219,9 @@ public class SessionImpl implements Session {
     }
 
     public void updateQuantity_M2N(String relationTable, String field1, Object value1, String field2, Object value2) {
-        try {
-            String query = QueryHelper.createQueryUPDATE_QUANTITY_M2N(relationTable, field1, field2);
-            PreparedStatement pstm = conn.prepareStatement(query);
+        String query = QueryHelper.createQueryUPDATE_QUANTITY_M2N(relationTable, field1, field2);
+        
+        try (PreparedStatement pstm = conn.prepareStatement(query)) {
             pstm.setObject(1, value1);
             pstm.setObject(2, value2);
             pstm.executeUpdate();
@@ -275,5 +229,4 @@ public class SessionImpl implements Session {
             e.printStackTrace();
         }
     }
-
 }

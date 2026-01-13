@@ -16,6 +16,7 @@ public class gameManagerTest {
     @Before
     public void setUp() throws Exception {
         this.gm = GameManagerImpl.getInstance();
+        gm.clear();
         gm.addNewObjeto("Espada", "Corta dragones", ESPADA, 10);
         gm.addNewObjeto("Escudo", "Resistente al fuego", ESCUDO, 20);
         gm.addNewObjeto("Pocion", "Recupera energía", POCION, 30);
@@ -23,7 +24,6 @@ public class gameManagerTest {
 
     @After
     public void tearDown() throws Exception {
-        this.gm = null;
     }
 
     @Test
@@ -33,8 +33,6 @@ public class gameManagerTest {
         this.gm.Register("name3", "3", "name3@example.com");
 
         Assert.assertEquals(3, gm.getNumberOfUsersRegistered());
-
-        tearDown();
     }
 
     @Test
@@ -47,8 +45,6 @@ public class gameManagerTest {
 
         Assert.assertEquals("name1", u.getUsername());
         Assert.assertEquals("1", u.getPassword());
-
-        tearDown();
     }
 
     @Test
@@ -57,7 +53,7 @@ public class gameManagerTest {
         this.gm.Register("name2", "2", "name2@example.com");
         this.gm.Register("name3", "3", "name3@example.com");
 
-        List<GameObject> l = gm.getListObjects("name1");
+        List<UserGameObject> l = gm.getListObjects("name1");
         Assert.assertEquals(0, l.size());
 
         gm.addObjectToUser("name1", gm.getObjectId("Espada"));
@@ -65,8 +61,6 @@ public class gameManagerTest {
 
         l = gm.getListObjects("name1");
         Assert.assertEquals(2, l.size());
-
-        tearDown();
     }
 
     @Test
@@ -78,15 +72,12 @@ public class gameManagerTest {
         gm.addObjectToUser("name1", gm.getObjectId("Espada"));
         gm.addObjectToUser("name2", gm.getObjectId("Escudo"));
 
-        List<GameObject> objetosName1 = gm.getListObjects("name1");
-        Assert.assertEquals(3, objetosName1.size());
-        Assert.assertEquals("Espada", objetosName1.get(0).getNombre());
-        Assert.assertEquals("Espada", objetosName1.get(2).getNombre());
+        List<UserGameObject> objetosName1 = gm.getListObjects("name1");
+        Assert.assertEquals(1, objetosName1.size());
+        Assert.assertEquals("Espada", objetosName1.get(0).getGameObject().getNombre());
 
-        List<GameObject> objetosName2 = gm.getListObjects("name2");
+        List<UserGameObject> objetosName2 = gm.getListObjects("name2");
         Assert.assertEquals(1, objetosName2.size());
-        Assert.assertEquals("Escudo", objetosName2.get(0).getNombre());
-
-        tearDown();
+        Assert.assertEquals("Escudo", objetosName2.get(0).getGameObject().getNombre());
     }
 }

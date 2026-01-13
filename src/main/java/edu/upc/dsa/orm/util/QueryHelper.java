@@ -138,12 +138,11 @@ public class QueryHelper {
     }
 
     public static String createqueryFINDALL(Class theClass, HashMap<String, String> params) {
-
-        Set<Map.Entry<String, String>> set = params.entrySet();
-
         StringBuffer sb = new StringBuffer("SELECT * FROM " + theClass.getSimpleName() + " WHERE 1=1");
-        for (String key : params.keySet()) {
-            sb.append(" AND " + key + "=?");
+        if (params != null) {
+            for (String key : params.keySet()) {
+                sb.append(" AND " + key + "=?");
+            }
         }
         return sb.toString();
     }
