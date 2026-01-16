@@ -26,4 +26,11 @@ public interface Session<E> {
     void updateQuantity_M2N(String relationTable, String field1, Object value1, String field2, Object value2);
 
     Connection getConnection();
+    
+    // Transaction management
+    void beginTransaction();
+    
+    void commit();
+    
+    void rollback();
 }
