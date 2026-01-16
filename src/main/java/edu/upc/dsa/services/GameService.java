@@ -13,6 +13,7 @@ import edu.upc.dsa.models.dto.RegisterCredentials;
 import edu.upc.dsa.models.dto.UserDTO;
 import edu.upc.dsa.models.dto.GameObjectDTO;
 import edu.upc.dsa.models.dto.RegistroEventoRequest;
+import edu.upc.dsa.models.dto.UserEventDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -194,4 +195,28 @@ public class GameService {
             return Response.status(500).entity("Error interno del servidor").build();
         }
     }
+
+    @GET
+    @Path("/events/{id}/users")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<UserEventDTO> getUsersOfEvent(@PathParam("id") String id) {
+
+        System.out.println("MINIMO2 | Solicitando usuarios del evento: " + id);
+
+        List<UserEventDTO> lista = new ArrayList<>();
+
+        lista.add(new UserEventDTO(
+                "Manolo", "Lama Lorenzo", "https://cdn.pixabay.com/photo/2017/07/11/15/51/kermit-2493979_1280.png"
+        ));
+
+        lista.add(new UserEventDTO(
+                "Arnau", "Fernandez Garcia", "https://cdn.pixabay.com/photo/2016/01/10/18/59/cookie-monster-1132275_1280.jpg"
+        ));
+
+        lista.add(new UserEventDTO("Miguel", "Lopez Alonso", "https://cdn.pixabay.com/photo/2017/07/11/15/51/kermit-2493979_1280.png"
+        ));
+
+        return lista;
+    }
 }
+
