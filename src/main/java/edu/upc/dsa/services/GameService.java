@@ -12,6 +12,7 @@ import edu.upc.dsa.models.dto.AddObject;
 import edu.upc.dsa.models.dto.RegisterCredentials;
 import edu.upc.dsa.models.dto.UserDTO;
 import edu.upc.dsa.models.dto.GameObjectDTO;
+import edu.upc.dsa.models.dto.RegistroEventoRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -47,6 +48,27 @@ public class GameService {
         List<Evento> events = this.gm.getEventos();
         GenericEntity<List<Evento>> entity = new GenericEntity<List<Evento>>(events) {};
         return Response.status(Response.Status.OK).entity(entity).build();
+    }
+
+    @POST
+    @Path("/events/{id}/register")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Inscribir usuario en un evento")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Faltan datos"),
+            @ApiResponse(code = 409, message = "No se ha podido inscribir")
+    })
+    public Response registerEvento(@PathParam("id") String id, RegistroEventoRequest request) {
+        if (request == null || request.getUserId() == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Falta userId").build();
+        }
+        boolean ok = this.gm.registerEvento(request.getUserId(), id);
+        if (!ok) {
+            return Response.status(Response.Status.CONFLICT).entity("No se ha podido inscribir").build();
+        }
+        return Response.status(Response.Status.OK).build();
     }
 
     @POST

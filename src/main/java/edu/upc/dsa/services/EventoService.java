@@ -3,7 +3,7 @@ package edu.upc.dsa.services;
 import edu.upc.dsa.GameManager;
 import edu.upc.dsa.GameManagerImpl;
 import edu.upc.dsa.models.Evento;
-import edu.upc.dsa.models.RegistroEventoRequest;
+import edu.upc.dsa.models.dto.RegistroEventoRequest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
