@@ -58,12 +58,19 @@ public class UserDAOImpl implements UserDAO {
         Session session = null;
         try {
             session = FactorySession.openSession();
-            session.update(user);
+            updateUser(session, user);
         } catch (Exception e) {
             logger.info("No se ha podido actualizar el usuario " + user.getUsername());
         } finally {
-            session.close();
+            if (session != null) {
+                session.close();
+            }
         }
+    }
+
+    // session externa para transacciones
+    public void updateUser(Session session, User user) {
+        session.update(user);
     }
 
     public void deleteUser(User user) {
@@ -124,7 +131,20 @@ public class UserDAOImpl implements UserDAO {
         Session session = null;
         try {
             session = FactorySession.openSession();
+            return buyItem(session, user, obj);
+        } catch (Exception e) {
+            logger.error("Error al comprar objeto " + obj.getId(), e);
+            throw new RuntimeException("Error al comprar objeto", e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
 
+    // session externa para transacciones
+    public String buyItem(Session session, User user, GameObject obj) {
+        try {
             // Verificar si el usuario ya tiene el objeto
             if (userHasObject(session, user.getUsername(), obj.getId())) {
                 // Incrementar cantidad
@@ -135,16 +155,11 @@ public class UserDAOImpl implements UserDAO {
                 session.save_M2N(user, obj, "User_GameObject");
                 logger.info("Objeto " + obj.getId() + " comprado por primera vez");
             }
-
+            return user.getUsername();
         } catch (Exception e) {
             logger.error("Error al comprar objeto " + obj.getId(), e);
             throw new RuntimeException("Error al comprar objeto", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
-        return user.getUsername();
     }
 
     private boolean userHasObject(Session session, String username, String objectId) {
@@ -164,63 +179,4 @@ public class UserDAOImpl implements UserDAO {
             throw new RuntimeException("Error al incrementar cantidad", e);
         }
     }
-
-    //
-    // public List<User> getEmployees() {
-    // Session session = null;
-    // List<User> employeeList=null;
-    // try {
-    // session = FactorySession.openSession();
-    // employeeList = session.findAll(User.class);
-    // }
-    // catch (Exception e) {
-    // // LOG
-    // }
-    // finally {
-    // session.close();
-    // }
-    // return employeeList;
-    // }
-    //
-    //
-    // public List<User> getEmployeeByDept(int deptID) {
-    //
-    // // SELECT e.name, d.name FROM Employees e, DEpt d WHERE e.deptId = d.ID AND
-    // e.edat>87 AND ........
-    //
-    //// Connection c =
-    //
-    // Session session = null;
-    // List<User> employeeList=null;
-    // try {
-    // session = FactorySession.openSession();
-    //
-    //
-    // HashMap<String, Integer> params = new HashMap<String, Integer>();
-    // params.put("deptID", deptID);
-    //
-    // employeeList = session.findAll(User.class, params);
-    // }
-    // catch (Exception e) {
-    // // LOG
-    // }
-    // finally {
-    // session.close();
-    // }
-    // return employeeList;
-    // }
-    //
-    // /*
-    //
-    // public void customQuery(xxxx) {
-    // Session session = null;
-    // List<Employee> employeeList=null;
-    // try {
-    // session = FactorySession.openSession();
-    // Connection c = session.getConnection();
-    // c.createStatement("SELECT * ")
-    //
-    // }
-    // */
-
 }

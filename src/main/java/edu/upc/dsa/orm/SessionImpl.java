@@ -11,6 +11,7 @@ import java.util.List;
 
 public class SessionImpl implements Session {
     private final Connection conn;
+    private boolean inTransaction = false;
 
     public SessionImpl(Connection conn) {
         this.conn = conn;
@@ -225,6 +226,44 @@ public class SessionImpl implements Session {
             pstm.setObject(1, value1);
             pstm.setObject(2, value2);
             pstm.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void beginTransaction() {
+        try {
+            if (!inTransaction) {
+                conn.setAutoCommit(false);
+                inTransaction = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void commit() {
+        try {
+            if (inTransaction) {
+                conn.commit();
+                conn.setAutoCommit(true);
+                inTransaction = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void rollback() {
+        try {
+            if (inTransaction) {
+                conn.rollback();
+                conn.setAutoCommit(true);
+                inTransaction = false;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

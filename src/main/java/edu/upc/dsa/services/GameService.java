@@ -2,6 +2,7 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.GameManager;
 import edu.upc.dsa.GameManagerImpl;
+import edu.upc.dsa.exceptions.*;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.models.User;
 import edu.upc.dsa.models.UserGameObject;
@@ -67,11 +68,15 @@ public class GameService {
 
         try {
             User u = gm.Register(credentials.getNombre(), credentials.getPassword(), credentials.getEmail());
-            UserDTO userDTO = new UserDTO(u.getUsername(), u.getPassword(), u.getEmail());
+            UserDTO userDTO = new UserDTO(u.getUsername(), null, u.getEmail());
             return Response.status(Response.Status.CREATED).entity(userDTO).build();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (UserAlreadyExistsException e) {
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(400).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
         }
 
     }
@@ -93,8 +98,11 @@ public class GameService {
         try {
             User u = gm.LogIn(credentials.getNombre(), credentials.getPassword());
             return Response.ok(u).build();
-        } catch (Exception e) {
+        } catch (FailedLoginException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
         }
     }
 
@@ -140,29 +148,33 @@ public class GameService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserObjects(@QueryParam("nombre") String nombre) {
 
-        List<UserGameObject> userObjects = this.gm.getListObjects(nombre);
+        try {
+            List<UserGameObject> userObjects = this.gm.getListObjects(nombre);
 
-        if (userObjects == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
+            List<GameObjectDTO> flattenedObjects = new ArrayList<>();
+            for (UserGameObject ugo : userObjects) {
+                GameObject obj = ugo.getGameObject();
+                GameObjectDTO dto = new GameObjectDTO(
+                        obj.getId(),
+                        obj.getNombre(),
+                        obj.getDescripcion(),
+                        obj.getTipo(),
+                        obj.getPrecio(),
+                        ugo.getCantidad());
+                flattenedObjects.add(dto);
+            }
+
+            GenericEntity<List<GameObjectDTO>> entity = new GenericEntity<List<GameObjectDTO>>(
+                    flattenedObjects) {
+            };
+            return Response.status(Response.Status.OK).entity(entity).build();
+
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
         }
-
-        List<GameObjectDTO> flattenedObjects = new ArrayList<>();
-        for (UserGameObject ugo : userObjects) {
-            GameObject obj = ugo.getGameObject();
-            GameObjectDTO dto = new GameObjectDTO(
-                    obj.getId(),
-                    obj.getNombre(),
-                    obj.getDescripcion(),
-                    obj.getTipo(),
-                    obj.getPrecio(),
-                    ugo.getCantidad());
-            flattenedObjects.add(dto);
-        }
-
-        GenericEntity<List<GameObjectDTO>> entity = new GenericEntity<List<GameObjectDTO>>(
-                flattenedObjects) {
-        };
-        return Response.status(Response.Status.OK).entity(entity).build();
     }
 
     @POST
@@ -181,13 +193,15 @@ public class GameService {
             return Response.status(400).entity("Falta 'nombre' o 'id del objeto'").build();
         }
 
-        User updatedUser = this.gm.addObjectToUser(request.getNombre(), request.getObjectId());
-
-        if (updatedUser == null) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Usuario u Objeto no encontrado").build();
+        try {
+            User updatedUser = this.gm.addObjectToUser(request.getNombre(), request.getObjectId());
+            return Response.status(Response.Status.OK).entity(updatedUser).build();
+        } catch (UserNotFoundException | ObjectNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
         }
-
-        return Response.status(Response.Status.OK).entity(updatedUser).build();
     }
 
     @POST
@@ -209,19 +223,15 @@ public class GameService {
 
         try {
             User updatedUser = this.gm.purchaseObject(request.getNombre(), request.getObjectId());
-
             return Response.status(200).entity(updatedUser).build();
 
+        } catch (InsufficientFundsException e) {
+            return Response.status(402).entity(e.getMessage()).build();
+        } catch (UserNotFoundException | ObjectNotFoundException e) {
+            return Response.status(404).entity(e.getMessage()).build();
         } catch (Exception e) {
-            String mensaje = e.getMessage();
-
-            if (mensaje.equals("Saldo insuficiente")) {
-                return Response.status(402).entity("No tienes suficientes monedas").build();
-            } else if (mensaje.equals("Usuario no encontrado") || mensaje.equals("Objeto no encontrado")) {
-                return Response.status(404).entity(mensaje).build();
-            } else {
-                return Response.status(500).entity("Error interno").build();
-            }
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
         }
     }
 }

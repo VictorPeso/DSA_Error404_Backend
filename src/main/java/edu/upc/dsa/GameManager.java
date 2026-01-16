@@ -1,5 +1,6 @@
 package edu.upc.dsa;
 
+import edu.upc.dsa.exceptions.*;
 import edu.upc.dsa.models.GameObject;
 import edu.upc.dsa.models.Objects;
 import edu.upc.dsa.models.User;
@@ -9,20 +10,20 @@ import java.util.List;
 
 public interface GameManager {
 
-    public User LogIn(String username, String password) throws Exception;
+    public User LogIn(String username, String password) throws FailedLoginException;
 
-    public User Register(String username, String password, String email) throws Exception;
+    public User Register(String username, String password, String email) throws UserAlreadyExistsException;
 
-    public Object addNewObjeto(String nombre, String descripcion, Objects tipo, int precio);
+    public GameObject addNewObjeto(String nombre, String descripcion, Objects tipo, int precio);
 
-    public User purchaseObject(String username, String objectId) throws Exception;
+    public User purchaseObject(String username, String objectId) throws UserNotFoundException, ObjectNotFoundException, InsufficientFundsException;
 
     // Objetos
-    public List<UserGameObject> getListObjects(String username);
+    public List<UserGameObject> getListObjects(String username) throws UserNotFoundException;
 
-    public User addObjectToUser(String username, String objectId);
+    public User addObjectToUser(String username, String objectId) throws UserNotFoundException, ObjectNotFoundException;
 
-    public String getObjectId(String objectName);
+    public String getObjectId(String objectName) throws ObjectNotFoundException;
 
     public List<GameObject> getAllStoreObjects();
 
