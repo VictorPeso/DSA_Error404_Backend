@@ -21,7 +21,7 @@ public class Main {
     public static final String BASE_URI = "http://localhost:8080/dsaApp/"; // http://192.168.10.49:8080/dsaApp/
 
     /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
+     * Starts Grizzly HTTP server exposing JAX-RS resources defined in thi-1s
      * application.
      * 
      * @return Grizzly HTTP server.
