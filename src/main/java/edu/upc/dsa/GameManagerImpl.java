@@ -158,12 +158,15 @@ public class GameManagerImpl implements GameManager {
             session.beginTransaction();
 
             User u = dao.getUser(username);
-            if (u == null) throw new UserNotFoundException("Usuario no encontrado: " + username);
+            if (u == null)
+                throw new UserNotFoundException("Usuario no encontrado: " + username);
 
             GameObject o = getStoreObject(objectId);
-            if (o == null) throw new ObjectNotFoundException("Objeto no encontrado: " + objectId);
+            if (o == null)
+                throw new ObjectNotFoundException("Objeto no encontrado: " + objectId);
 
-            if (u.getMonedas() < o.getPrecio()) throw new InsufficientFundsException("Saldo insuficiente");
+            if (u.getMonedas() < o.getPrecio())
+                throw new InsufficientFundsException("Saldo insuficiente");
 
             u.setMonedas(u.getMonedas() - o.getPrecio());
             dao.updateUser(session, u);
@@ -173,13 +176,16 @@ public class GameManagerImpl implements GameManager {
             return u;
 
         } catch (UserNotFoundException | ObjectNotFoundException | InsufficientFundsException e) {
-            if (session != null) session.rollback();
+            if (session != null)
+                session.rollback();
             throw e;
         } catch (Exception e) {
-            if (session != null) session.rollback();
+            if (session != null)
+                session.rollback();
             throw new RuntimeException("Error al procesar compra", e);
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -207,7 +213,8 @@ public class GameManagerImpl implements GameManager {
             List<Object> users = session.findAll(User.class, new HashMap<>());
             return users != null ? users.size() : 0;
         } finally {
-            if (session != null) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -235,7 +242,8 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public boolean registerEvento(String userId, String eventoId) {
-        if (userId == null || eventoId == null) return false;
+        if (userId == null || eventoId == null)
+            return false;
 
         Set<String> inscritos = registrosEvento.get(eventoId);
         if (inscritos == null) {
@@ -246,7 +254,8 @@ public class GameManagerImpl implements GameManager {
     }
 
     public GameObject getStoreObject(String id) {
-        if (id == null || id.trim().isEmpty()) return null;
+        if (id == null || id.trim().isEmpty())
+            return null;
         return objectsById.get(id);
     }
 
@@ -305,7 +314,8 @@ public class GameManagerImpl implements GameManager {
             logger.info("BestScore actualizado a: " + bestScore + " para usuario " + username);
             updated = true;
         } else if (bestScore != null) {
-            logger.info("BestScore no actualizado (" + bestScore + " no es mayor que el actual: " + u.getBestScore() + ")");
+            logger.info(
+                    "BestScore no actualizado (" + bestScore + " no es mayor que el actual: " + u.getBestScore() + ")");
         }
 
         if (updated) {
@@ -313,6 +323,37 @@ public class GameManagerImpl implements GameManager {
             logger.info("Progreso guardado correctamente para " + username);
         } else {
             logger.info("No hubo cambios en el progreso para " + username);
+        }
+    }
+
+    @Override
+    public void updateObjectQuantity(String username, String objectId, int newQuantity)
+            throws UserNotFoundException, ObjectNotFoundException {
+        ValidationUtils.validateNotEmpty(username, "username");
+        ValidationUtils.validateNotEmpty(objectId, "objectId");
+
+        username = username.toLowerCase();
+        logger.info(
+                "Actualizando cantidad de objeto '" + objectId + "' a " + newQuantity + " para usuario: " + username);
+
+        User u = dao.getUser(username);
+        if (u == null) {
+            logger.error("Usuario no encontrado: " + username);
+            throw new UserNotFoundException("Usuario no encontrado: " + username);
+        }
+
+        GameObject obj = objectsById.get(objectId);
+        if (obj == null) {
+            logger.error("Objeto no encontrado: " + objectId);
+            throw new ObjectNotFoundException("Objeto no encontrado: " + objectId);
+        }
+
+        if (newQuantity <= 0) {
+            dao.removeObjectFromUser(username, objectId);
+            logger.info("Objeto '" + objectId + "' eliminado del inventario de " + username);
+        } else {
+            dao.updateObjectQuantity(username, objectId, newQuantity);
+            logger.info("Cantidad de objeto '" + objectId + "' actualizada a " + newQuantity + " para " + username);
         }
     }
 }

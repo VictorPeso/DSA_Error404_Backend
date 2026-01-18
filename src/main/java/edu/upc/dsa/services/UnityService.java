@@ -11,6 +11,7 @@ import edu.upc.dsa.models.dto.AddCoinsRequest;
 import edu.upc.dsa.models.dto.AddObject;
 import edu.upc.dsa.models.dto.GameObjectDTO;
 import edu.upc.dsa.models.dto.UpdateProgressRequest;
+import edu.upc.dsa.models.dto.UpdateObjectQuantityRequest;
 import edu.upc.dsa.models.dto.UnityProfileResponse;
 
 import io.swagger.annotations.Api;
@@ -157,6 +158,37 @@ public class UnityService {
         try {
             // Este método añade el objeto SIN cobrar monedas (perfecto para drops)
             User updatedUser = gm.addObjectToUser(request.getNombre(), request.getObjectId());
+            return Response.status(200).entity(updatedUser).build();
+        } catch (UserNotFoundException | ObjectNotFoundException e) {
+            return Response.status(404).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).entity("Error interno del servidor").build();
+        }
+    }
+
+    @POST
+    @Path("/update-object-quantity")
+    @ApiOperation(value = "Actualizar cantidad de un objeto del usuario (para pociones usadas)")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Cantidad actualizada", response = User.class),
+            @ApiResponse(code = 404, message = "Usuario u Objeto no encontrado"),
+            @ApiResponse(code = 400, message = "Datos inválidos")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateObjectQuantity(UpdateObjectQuantityRequest request) {
+        if (request.getUsername() == null || request.getObjectId() == null || request.getNewQuantity() == null) {
+            return Response.status(400).entity("Faltan username, objectId o newQuantity").build();
+        }
+
+        if (request.getNewQuantity() < 0) {
+            return Response.status(400).entity("La cantidad no puede ser negativa").build();
+        }
+
+        try {
+            gm.updateObjectQuantity(request.getUsername(), request.getObjectId(), request.getNewQuantity());
+            User updatedUser = gm.getUser(request.getUsername());
             return Response.status(200).entity(updatedUser).build();
         } catch (UserNotFoundException | ObjectNotFoundException e) {
             return Response.status(404).entity(e.getMessage()).build();

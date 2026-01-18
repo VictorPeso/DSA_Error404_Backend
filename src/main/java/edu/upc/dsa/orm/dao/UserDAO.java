@@ -16,7 +16,12 @@ public interface UserDAO {
 
     List<UserGameObject> getObjectsbyUser(User user);
 
+    void removeObjectFromUser(String username, String objectId);
+
+    void updateObjectQuantity(String username, String objectId, int newQuantity);
+
     // Optional methods - uncomment if needed:
     // public List<User> getUsers();
     // public List<User> getEmployeeByDept(int deptId);
 }
+

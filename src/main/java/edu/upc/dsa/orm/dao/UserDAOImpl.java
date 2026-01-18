@@ -179,4 +179,64 @@ public class UserDAOImpl implements UserDAO {
             throw new RuntimeException("Error al incrementar cantidad", e);
         }
     }
+
+    @Override
+    public void removeObjectFromUser(String username, String objectId) {
+        Session session = null;
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        try {
+            session = FactorySession.openSession();
+            conn = session.getConnection();
+
+            String query = "DELETE FROM User_GameObject WHERE username = ? AND id = ?";
+            pstm = conn.prepareStatement(query);
+            pstm.setString(1, username);
+            pstm.setString(2, objectId);
+            pstm.executeUpdate();
+
+            logger.info("Objeto " + objectId + " eliminado del inventario de " + username);
+        } catch (Exception e) {
+            logger.error("Error al eliminar objeto del usuario", e);
+            throw new RuntimeException("Error al eliminar objeto", e);
+        } finally {
+            try {
+                if (pstm != null) pstm.close();
+            } catch (Exception e) {
+                logger.error("Error al cerrar PreparedStatement", e);
+            }
+            if (session != null) session.close();
+        }
+    }
+
+    @Override
+    public void updateObjectQuantity(String username, String objectId, int newQuantity) {
+        Session session = null;
+        Connection conn = null;
+        PreparedStatement pstm = null;
+        try {
+            session = FactorySession.openSession();
+            conn = session.getConnection();
+
+            String query = "UPDATE User_GameObject SET cantidad = ? WHERE username = ? AND id = ?";
+            pstm = conn.prepareStatement(query);
+            pstm.setInt(1, newQuantity);
+            pstm.setString(2, username);
+            pstm.setString(3, objectId);
+            pstm.executeUpdate();
+
+            logger.info("Cantidad de objeto " + objectId + " actualizada a " + newQuantity + " para " + username);
+        } catch (Exception e) {
+            logger.error("Error al actualizar cantidad del objeto", e);
+            throw new RuntimeException("Error al actualizar cantidad", e);
+        } finally {
+            try {
+                if (pstm != null) pstm.close();
+            } catch (Exception e) {
+                logger.error("Error al cerrar PreparedStatement", e);
+            }
+            if (session != null) session.close();
+        }
+    }
 }
+

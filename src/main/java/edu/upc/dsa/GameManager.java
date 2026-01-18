@@ -37,4 +37,6 @@ public interface GameManager {
     void addCoinsToUser(String username, int amount) throws UserNotFoundException;
 
     void updateUserProgress(String username, Integer actFrag, Integer bestScore) throws UserNotFoundException;
+
+    void updateObjectQuantity(String username, String objectId, int newQuantity) throws UserNotFoundException, ObjectNotFoundException;
 }
