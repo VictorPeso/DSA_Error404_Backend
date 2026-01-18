@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS User_GameObject (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj01', 'Espada de Fuego', 'Una espada legendaria que causa daño de fuego', 'ESPADA', 150),
-('obj02', 'Escudo Mágico', 'Escudo que absorbe daño mágico', 'ESCUDO', 120),
+('obj01', 'Espada de Fuego', 'Una espada legendaria que causa daño de fuego', 'ARMA', 150),
+('obj02', 'Escudo Mágico', 'Escudo que absorbe daño mágico', 'ARMADURA', 120),
 ('obj03', 'Poción de Vida', 'Restaura 50 puntos de vida', 'POCION', 30);
 
 INSERT IGNORE INTO User (username, password, email, ActFrag, BestScore, vidaInicial, monedas) VALUES

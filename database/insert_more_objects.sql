@@ -15,25 +15,25 @@ USE error404db;
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
 ('obj04', 'Poción Pequeña', 'Restaura 25 puntos de vida', 'POCION', 20),
-('obj05', 'Daga Básica', 'Daga de entrenamiento (+10 daño)', 'ESPADA', 30),
-('obj06', 'Escudo de Madera', 'Protección básica (+8 defensa)', 'ESCUDO', 35);
+('obj05', 'Daga Básica', 'Daga de entrenamiento (+10 daño)', 'ARMA', 30),
+('obj06', 'Escudo de Madera', 'Protección básica (+8 defensa)', 'ARMADURA', 35);
 
 -- =====================================================
 -- OBJETOS RAROS (30% drop) - Precio: 75-110
 -- =====================================================
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj09', 'Espada de Acero', 'Espada forjada en acero resistente (+25 daño)', 'ESPADA', 90),
+('obj09', 'Espada de Acero', 'Espada forjada en acero resistente (+25 daño)', 'ARMA', 90),
 ('obj10', 'Armadura de Hierro', 'Armadura pesada y resistente (+20 defensa, +30 HP)', 'ARMADURA', 110),
-('obj11', 'Casco de Soldado', 'Casco de batalla que protege la cabeza (+12 defensa)', 'CASCO', 75);
+('obj11', 'Casco de Soldado', 'Casco de batalla que protege la cabeza (+12 defensa)', 'ARMADURA', 75);
 
 -- =====================================================
 -- OBJETOS ÉPICOS (15% drop) - Precio: 180-200
 -- =====================================================
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj14', 'Espada Encantada', 'Espada imbuida con magia antigua (+40 daño, +10% crítico)', 'ESPADA', 180),
-('obj15', 'Escudo de Dragón', 'Escudo forjado con escamas de dragón (+35 defensa, +50 HP)', 'ESCUDO', 200);
+('obj14', 'Espada Encantada', 'Espada imbuida con magia antigua (+40 daño, +10% crítico)', 'ARMA', 180),
+('obj15', 'Escudo de Dragón', 'Escudo forjado con escamas de dragón (+35 defensa, +50 HP)', 'ARMADURA', 200);
 
 -- =====================================================
 -- OBJETOS LEGENDARIOS (5% drop) - Precio: 300-450
