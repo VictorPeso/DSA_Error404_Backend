@@ -315,4 +315,65 @@ public class GameManagerImpl implements GameManager {
         logger.info("Obteniendo todos los objetos de la tienda");
         return this.objects;
     }
+
+    // ==================== UNITY INTEGRATION METHODS ====================
+
+    @Override
+    public void addCoinsToUser(String username, int amount) throws UserNotFoundException {
+        ValidationUtils.validateNotEmpty(username, "username");
+        ValidationUtils.validatePositive(amount, "amount");
+
+        username = username.toLowerCase();
+        logger.info("Añadiendo " + amount + " monedas al usuario: " + username);
+
+        User u = dao.getUser(username);
+        if (u == null) {
+            logger.error("Usuario no encontrado: " + username);
+            throw new UserNotFoundException("Usuario no encontrado: " + username);
+        }
+
+        int newBalance = u.getMonedas() + amount;
+        u.setMonedas(newBalance);
+        dao.updateUser(u);
+
+        logger.info("Monedas actualizadas para " + username + ". Nuevo saldo: " + newBalance);
+    }
+
+    @Override
+    public void updateUserProgress(String username, Integer actFrag, Integer bestScore)
+            throws UserNotFoundException {
+        ValidationUtils.validateNotEmpty(username, "username");
+
+        username = username.toLowerCase();
+        logger.info("Actualizando progreso del usuario: " + username);
+
+        User u = dao.getUser(username);
+        if (u == null) {
+            logger.error("Usuario no encontrado: " + username);
+            throw new UserNotFoundException("Usuario no encontrado: " + username);
+        }
+
+        boolean updated = false;
+
+        if (actFrag != null) {
+            u.setActFrag(actFrag);
+            logger.info("ActFrag actualizado a: " + actFrag + " para usuario " + username);
+            updated = true;
+        }
+
+        if (bestScore != null && bestScore > u.getBestScore()) {
+            u.setBestScore(bestScore);
+            logger.info("BestScore actualizado a: " + bestScore + " para usuario " + username);
+            updated = true;
+        } else if (bestScore != null) {
+            logger.info("BestScore no actualizado (" + bestScore + " no es mayor que el actual: " + u.getBestScore() + ")");
+        }
+
+        if (updated) {
+            dao.updateUser(u);
+            logger.info("Progreso guardado correctamente para " + username);
+        } else {
+            logger.info("No hubo cambios en el progreso para " + username);
+        }
+    }
 }

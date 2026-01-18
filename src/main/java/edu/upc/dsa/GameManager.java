@@ -33,4 +33,9 @@ public interface GameManager {
     public User getUser(String username);
 
     public void clear();
+
+    // Unity integration methods
+    public void addCoinsToUser(String username, int amount) throws UserNotFoundException;
+
+    public void updateUserProgress(String username, Integer actFrag, Integer bestScore) throws UserNotFoundException;
 }
