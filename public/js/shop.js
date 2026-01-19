@@ -25,15 +25,6 @@ $(document).ready(function(){
         }, 1500);
     });
 
-    // Transition Link Handler - para navegación entre páginas
-    $(".transition-link").click(function(e){
-        e.preventDefault();
-        const target = $(this).attr("href");
-        if(target === "#") return;
-        
-        transicionPagina(target);
-    });
-
     // Buy Button Handler - usa event delegation porque los botones se crean dinámicamente
     $(document).on("click", ".buy-btn", function(e){
         e.preventDefault();
