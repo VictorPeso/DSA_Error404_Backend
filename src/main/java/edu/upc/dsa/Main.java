@@ -40,7 +40,7 @@ public class Main {
 
         BeanConfig beanConfig = new BeanConfig();
 
-        beanConfig.setHost("192.168.1.128:8080"); // 192.168.10.49:8080
+        beanConfig.setHost("192.168.10.49:8080"); // 192.168.10.49:8080
         beanConfig.setBasePath("/dsaApp");
         beanConfig.setContact("support@example.com");
         beanConfig.setDescription("REST API for Error404");
