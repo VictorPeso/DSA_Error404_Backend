@@ -14,26 +14,26 @@ USE error404db;
 -- =====================================================
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj04', 'Poción Pequeña', 'Restaura 25 puntos de vida', 'POCION', 20),
-('obj05', 'Daga Básica', 'Daga de entrenamiento (+10 daño)', 'ARMA', 30),
-('obj06', 'Escudo de Madera', 'Protección básica (+8 defensa)', 'ARMADURA', 35);
+('obj04', 'Reinicio rápido', 'Restaura 25 puntos de vida', 'POCION', 20),
+('obj05', 'Escaner de paquetes', 'Ataque básico (+10 daño)', 'ARMA', 30),
+('obj06', 'Firewall adaptativo', 'Protección básica (+8 defensa)', 'ARMADURA', 35);
 
 -- =====================================================
 -- OBJETOS RAROS (30% drop) - Precio: 75-110
 -- =====================================================
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj09', 'Espada de Acero', 'Espada forjada en acero resistente (+25 daño)', 'ARMA', 90),
-('obj10', 'Armadura de Hierro', 'Armadura pesada y resistente (+20 defensa, +30 HP)', 'ARMADURA', 110),
-('obj11', 'Casco de Soldado', 'Casco de batalla que protege la cabeza (+12 defensa)', 'ARMADURA', 75);
+('obj09', 'Antivirus predictivo', 'Antivirus resistente a cualquier amenaza (+25 daño)', 'ARMA', 90),
+('obj10', 'Actualización de emergencia', 'Actualización pesada y resistente (+20 defensa, +30 HP)', 'ARMADURA', 110),
+('obj11', 'Snapshot del sistema', 'Copia de seguridad que ofrece protección (+12 defensa)', 'ARMADURA', 75);
 
 -- =====================================================
 -- OBJETOS ÉPICOS (15% drop) - Precio: 180-200
 -- =====================================================
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj14', 'Espada Encantada', 'Espada imbuida con magia antigua (+40 daño, +10% crítico)', 'ARMA', 180),
-('obj15', 'Escudo de Dragón', 'Escudo forjado con escamas de dragón (+35 defensa, +50 HP)', 'ARMADURA', 200);
+('obj14', 'Destructor de malware', 'Encargado de eliminar toda amenaza sospechosa (+40 daño, +10% crítico)', 'ARMA', 180),
+('obj15', 'Cifrado avanzado', 'Cifrado forjado por ingenieros expertos (+35 defensa, +50 HP)', 'ARMADURA', 200);
 
 -- =====================================================
 -- OBJETOS LEGENDARIOS (5% drop) - Precio: 300-450
@@ -42,7 +42,7 @@ INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
 -- obj01 ya existe (Espada de Fuego - 300 monedas)
 
 INSERT IGNORE INTO GameObject (id, nombre, descripcion, tipo, precio) VALUES
-('obj18', 'Armadura del Titán', 'Armadura legendaria indestructible (+60 defensa, +100 HP, -15% daño recibido)', 'ARMADURA', 450);
+('obj18', 'CCleaner', 'Protege hasta del malware indestructible (+60 defensa, +100 HP, -15% daño recibido)', 'ARMADURA', 450);
 
 -- =====================================================
 -- RESUMEN DE OBJETOS (10 TOTALES)
